@@ -22,9 +22,12 @@ commonSettings はよく使ってるやつを持ってきただけなので、�
 設定は root の変数のほうがメインです。
 resolver はこちらのサンプルのものをそのまま持ってきました。  
 https://github.com/scalameter/scalameter-examples/blob/master/basic-with-separate-config/build.sbt
+
 parallelExecution の設定はおそらく同時に実行するとちゃんと計測できないためか false にすべきという感じでした。  
-ドキュメントの場合、 `parallelExecution in Test := false` となっているのですが、sample と同様の形にしていて、Test とは別に Benchmark というものを作ったので `parallelExecution in Benchmark := false` にしています。  
-また、これは sbt のバージョンが上がったため、in ではなく/を使えという風に書いてあるので、 `Benchmark / parallelExecution := false` と書くと良さそうです。  
+https://scalameter.github.io/home/gettingstarted/0.5/sbt/
+
+ドキュメントの場合、 `parallelExecution in Test := false` となっているのですが、サンプルと同様の形にしていて、Test とは別に Benchmark というものを作ったので `parallelExecution in Benchmark := false` にしています。  
+また、これは sbt のバージョンが上がったため、in ではなく/を使えという風に sbt のログが出てしまうので、 `Benchmark / parallelExecution := false` と書くと良さそうです。  
 Test として認識させるために設定が必要なみたいなので、 `testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework")` も追記しています。  
 最後に logBuffered ですが、 https://www.scala-sbt.org/1.x/docs/Testing.html ここに説明がありました。  
 これが true の場合バッファを持って最後まで持ち続けるらしいのですが、特段メリットもないので false で良さそうです。
