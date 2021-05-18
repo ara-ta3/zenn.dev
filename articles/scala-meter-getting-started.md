@@ -3,7 +3,7 @@ title: "Scala Meterを使ってScalaコードのベンチマークを測る"
 emoji: "⛳"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Scala", "Benchmark"]
-published: false
+published: true
 ---
 
 Scala のベンチマークツールの ScalaMeter を使ってみたので、メモがてらの紹介です。
