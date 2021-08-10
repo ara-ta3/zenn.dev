@@ -3,7 +3,7 @@ title: "Sentry JavaScript SDKでUser Feedbackウィジェットを使ってみ�
 emoji: "🐕"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Sentry", "JavaScript"]
-published: false
+published: true
 ---
 
 アプリケーションのモニタリングツールに Sentry というものがあるのですが、  
