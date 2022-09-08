@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/ara-ta3/zenn.dev#readme",
   "dependencies": {
-    "zenn-cli": "^0.1.110"
+    "zenn-cli": "^0.1.122"
   }
 }
