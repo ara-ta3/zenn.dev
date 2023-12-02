@@ -9,22 +9,23 @@ published: false
 Go を久しぶりに触ったんですけど、設定を取得するライブラリってどんなのが良いのかなって思ってググったらこんな記事があって、star が多いのが viper というライブラリだったので、そこ少し触ってみた備忘録です。  
 ref: https://qiita.com/tashxii/items/ae6382b89049ffbb8ba5
 
-- 最小限の構成
-
-```tree
-.
-├── go.mod
-├── go.sum
-└── main.go
-
-1 directory, 3 files
-```
-
-- コード
+# 最小限の構成
 
 ```
 go get github.com/spf13/viper
 ```
+
+```tree
+.
+├── .env
+├── go.mod
+├── go.sum
+└── main.go
+
+1 directory, 4 files
+```
+
+- コード
 
 ```env
 XXX=a
