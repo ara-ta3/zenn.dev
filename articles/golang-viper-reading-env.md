@@ -10,6 +10,61 @@ Go を久しぶりに触ったんですけど、設定を取得するライブ�
 ref: https://qiita.com/tashxii/items/ae6382b89049ffbb8ba5
 
 - 最小限の構成
+
+```tree
+.
+├── go.mod
+├── go.sum
+└── main.go
+
+1 directory, 3 files
+```
+
 - コード
-- fmt.Printf
+
+```
+go get github.com/spf13/viper
+```
+
+```env
+XXX=a
+YYY=b
+ZZZ=c
+```
+
+```go
+package main
+
+import (
+	"github.com/spf13/viper"
+)
+
+func main() {
+	c, err := Load()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func Load() (config *EnvConfigs, err error) {
+	viper.AddConfigPath(".")
+	viper.SetConfigName(".env")
+	viper.SetConfigType("env")
+
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, err
+	}
+
+	if err := viper.Unmarshal(&config); err != nil {
+		return nil, err
+	}
+	return
+}
+
+type EnvConfigs struct {
+	X string `mapstructure:"XXX"`
+	Y string `mapstructure:"YYY"`
+}
+```
+
 - まとめ
