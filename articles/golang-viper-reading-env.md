@@ -3,7 +3,7 @@ title: "Goの設定ライブラリのviperで.envファイルから設定を取�
 emoji: "📚"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Go", "viper", "env"]
-published: false
+published: true
 ---
 
 Go を久しぶりに触ったんですけど、設定を取得するライブラリってどんなのが良いのかなって思って、awesome-go を見に行って見ました。
