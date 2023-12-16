@@ -2,7 +2,7 @@
 title: "Netdataのstream機能でネットワーク内の親機にメトリクスを送る"
 emoji: "📌"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["netdata"]
+topics: ["netdata", "監視", "SRE", "macOS"]
 published: false
 ---
 
