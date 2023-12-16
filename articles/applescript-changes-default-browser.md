@@ -2,7 +2,7 @@
 title: "AppleScriptでデフォルトブラウザを変更する"
 emoji: "🗂"
 type: "tech"
-topics: ["AppleScript"]
+topics: ["AppleScript", "macOS"]
 published: true
 ---
 
