@@ -3,7 +3,7 @@ title: "Netdataのstream機能でネットワーク内の親機にメトリク�
 emoji: "📌"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["netdata", "監視", "SRE", "macOS"]
-published: false
+published: true
 ---
 
 家のデータとかをモニタリングできないかなと思って探していたら netdata というものを知って、それを raspberry pi といつも作業している PC に入れて、メトリクスを raspberry pi の方に集約させてみたのでその時の備忘録です。
