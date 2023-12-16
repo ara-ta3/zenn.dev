@@ -4,6 +4,7 @@ emoji: "🗂"
 type: "tech"
 topics: ["AppleScript", "macOS"]
 published: true
+publiched_at: 2021-05-17
 ---
 
 デフォルトブラウザを仕事とプライベートで切り替えるタイミングが発生したので、Script で出来ないかなと思い、Apple Script にたどり着いたのでデフォルトブラウザを切り替えてみました。
