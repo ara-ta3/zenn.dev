@@ -3,7 +3,7 @@ title: "ddc.vimをdein.vimでインストールしてvimで補完が効くよう
 emoji: "📝"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["vim", "vimrc", "ddc", "dein"]
-published: false
+published: true
 ---
 
 久々にdotfilesからvimの設定をしたら補完が効かなくなっていたので、最新のpluginに変更するなどしました。  
