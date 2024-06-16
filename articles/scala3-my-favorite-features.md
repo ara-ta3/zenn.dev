@@ -117,7 +117,8 @@ hello
 
 ## Universal Apply Methods (class Hoge(n: Int) / Hoge(10))
 
-- https://docs.scala-lang.org/scala3/reference/other-new-features/creator-applications.html
+https://docs.scala-lang.org/scala3/reference/other-new-features/creator-applications.html
+
 - case classじゃなくてもapplyが自動生成されるようになった
 - ↓が可能になった
     - class Hoge(n: Int)
@@ -125,7 +126,8 @@ hello
 
 ## Opaque Type Aliases (opaque type Foo = Int / def x(f: Foo) / x(10) to compile error)
 
-- https://docs.scala-lang.org/scala3/reference/other-new-features/opaques.html
+https://docs.scala-lang.org/scala3/reference/other-new-features/opaques.html
+
 - Typeでもコンパイルエラーになってくれる！！！
 - めっちゃ欲しかったやつ！！！
 
@@ -157,12 +159,15 @@ scala> x(10)
 
 ## Open Classes (open class Hoge())
 
-- https://docs.scala-lang.org/scala3/reference/other-new-features/open-classes.html
+https://docs.scala-lang.org/scala3/reference/other-new-features/open-classes.html
+
 - デフォルトでfinalになったらしい
 - 継承を許容するならopenをつけよう
 
 ### Parameter Untupling  (xs.map { case (x, y) ... } => xs.map { (x, y) ... })
-- https://docs.scala-lang.org/scala3/reference/other-new-features/parameter-untupling.html
+
+https://docs.scala-lang.org/scala3/reference/other-new-features/parameter-untupling.html
+
 - Tupleを関数の引数に自動で適用できるって！！！！
     - 便利じゃん！！！！
 
@@ -175,7 +180,8 @@ scala> x(10)
 
 ## Vararg Splices (seq: _* => seq*)
 
-- https://docs.scala-lang.org/scala3/reference/changed-features/vararg-splices.html
+https://docs.scala-lang.org/scala3/reference/changed-features/vararg-splices.html
+
 - `: _*` から `*` になった
 
 
@@ -183,7 +189,7 @@ scala> x(10)
 
 ## Dropped: Package Objects
 
-- https://docs.scala-lang.org/scala3/reference/dropped-features/package-objects.html
+https://docs.scala-lang.org/scala3/reference/dropped-features/package-objects.html
 
 
 ## Dropped: Limit 22
@@ -203,10 +209,11 @@ https://docs.scala-lang.org/scala3/reference/dropped-features/this-qualifier.htm
 
 ## New Types -> Type Lambdas
 
-- https://docs.scala-lang.org/scala3/reference/new-types/type-lambdas.html
+https://docs.scala-lang.org/scala3/reference/new-types/type-lambdas.html
 
 ## New Types -> Match Types
-- https://docs.scala-lang.org/scala3/reference/new-types/match-types.html#
+
+https://docs.scala-lang.org/scala3/reference/new-types/match-types.html#
 
 - マッチタイプのパターンマッチが出来るようになったらしい
 - 使い所がぱっと浮かばなくてむずい
@@ -220,16 +227,18 @@ type Element[X] = X match {
 ```
 
 ## Metaprogramming -> Inline
-- https://docs.scala-lang.org/scala3/reference/metaprogramming/inline.html
+
+https://docs.scala-lang.org/scala3/reference/metaprogramming/inline.html
 
 
 ## Contextual Abstractions -> Multiversal Equality
 
-- https://docs.scala-lang.org/scala3/reference/contextual/multiversal-equality.html
+https://docs.scala-lang.org/scala3/reference/contextual/multiversal-equality.html
 
 
 ## Other New Features -> Matchable Trait
-- https://docs.scala-lang.org/scala3/reference/other-new-features/matchable.html
+
+https://docs.scala-lang.org/scala3/reference/other-new-features/matchable.html
 - Anyでmatchできなくなった
 - Matchable Traitなら出来る
 
