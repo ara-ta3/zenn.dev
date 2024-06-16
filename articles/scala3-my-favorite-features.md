@@ -3,7 +3,7 @@ title: "Scala3の新機能で個人的に使いそうなもののメモたち"
 emoji: "🦔"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Scala", "Scala3"]
-published: false
+published: true
 ---
 
 # 概要
