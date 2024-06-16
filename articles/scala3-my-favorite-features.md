@@ -10,14 +10,16 @@ published: false
 
 Scala3が出てそれなりに経ちました。  
 そろそろ向き合うかと思いドキュメントを眺めて差分をまとめてみるかと思ったのですが、結構多いしメタプログラミングはあまり触っていないので、向き合いきれないなと思い、個人的に使いそうだなと思った好きな機能を例と共に備忘録に残そうと思った次第です。  
-主に https://docs.scala-lang.org/scala3/reference/index.html を見ました。  
+主に https://docs.scala-lang.org/scala3/reference/index.html を見て、このページの目次の流れに沿いつつメモっています。  
 
+## 参考URL
 
-# 新機能
+- https://docs.scala-lang.org/scala3/reference/index.html
+- https://docs.scala-lang.org/ja/scala3/new-in-scala3.html
 
-## New Types
+# New Types
 
-### Intersection Types
+## Intersection Types (Foo & Bar)
 
 ```scala
 scala> trait Foo { def foo(): Unit = println("foo") }
@@ -40,7 +42,7 @@ foo
 bar
 ```
 
-### Union Types
+## Union Types (Foo | Bar)
 
 ```scala
 scala> def hoge(x: Int|String): String = x match {
@@ -64,9 +66,9 @@ scala> def hoge(x: Int|String): String = x match {
 def hoge(x: Int | String): String
 ```
 
-## Contextual Abstractions
+# Contextual Abstractions
 
-### Given Instances / Using Clauses
+## Given Instances / Using Clauses (implicit => given or using)
 
 ```scala
 scala> val x: Int = 1
@@ -83,7 +85,7 @@ scala> x == y
 1 error found
 ```
 
-### Extension Methods
+## Extension Methods (implicit conversion => extension)
 
 ```scala
 extension (x: Int) {
@@ -99,9 +101,9 @@ scala> 10.isEven
 val res4: Boolean = true
 ```
 
-## Other New Features
+# Other New Features
 
-### Trait Parameters
+## Trait Parameters (trait Hoge(m: String))
 
 ```scala
 scala> trait Hoge(m: String) {
@@ -113,7 +115,7 @@ scala> (new Hoge("hello"){}).hoge()
 hello
 ```
 
-### Universal Apply Methods
+## Universal Apply Methods (class Hoge(n: Int) / Hoge(10))
 
 - https://docs.scala-lang.org/scala3/reference/other-new-features/creator-applications.html
 - case classじゃなくてもapplyが自動生成されるようになった
@@ -121,53 +123,81 @@ hello
     - class Hoge(n: Int)
     - Hoge(10)
 
-### Opaque Type Aliases 
+## Opaque Type Aliases (opaque type Foo = Int / def x(f: Foo) / x(10) to compile error)
 
+- https://docs.scala-lang.org/scala3/reference/other-new-features/opaques.html
 - Typeでもコンパイルエラーになってくれる！！！
 - めっちゃ欲しかったやつ！！！
 
+```scala
+scala> object Hoge {
+     |   opaque type Foo = Int
+     |   object Foo {
+     |     def apply(x: Int): Foo = x
+     |   }
+     | }
+// defined object Hoge
 
-### Open Classes
+scala> def x(f: Hoge.Foo): Unit = println(f)
+def x(f: Hoge.Foo): Unit
+
+scala> x(Hoge.Foo(10))
+10
+
+scala> x(10)
+-- [E007] Type Mismatch Error: -------------------------------------------------
+1 |x(10)
+  |  ^^
+  |  Found:    (10 : Int)
+  |  Required: Hoge.Foo
+  |
+  | longer explanation available when compiling with `-explain`
+1 error found
+```
+
+## Open Classes (open class Hoge())
 
 - https://docs.scala-lang.org/scala3/reference/other-new-features/open-classes.html
 - デフォルトでfinalになったらしい
 - 継承を許容するならopenをつけよう
 
-#### Parameter Untupling
+### Parameter Untupling  (xs.map { case (x, y) ... } => xs.map { (x, y) ... })
 - https://docs.scala-lang.org/scala3/reference/other-new-features/parameter-untupling.html
 - Tupleを関数の引数に自動で適用できるって！！！！
     - 便利じゃん！！！！
 
-#### New Control Syntax
+### New Control Syntax
 
 - カッコの省略形
     - if thenが使いやすいかも
 
-## Other Changed Features
+# Other Changed Features
+
+## Vararg Splices (seq: _* => seq*)
 
 - https://docs.scala-lang.org/scala3/reference/changed-features/vararg-splices.html
 - `: _*` から `*` になった
 
 
-## Dropped Features
+# Dropped Features
 
-### Dropped: Package Objects
+## Dropped: Package Objects
 
 - https://docs.scala-lang.org/scala3/reference/dropped-features/package-objects.html
 
 
-### Dropped: Limit 22
+## Dropped: Limit 22
 
 https://docs.scala-lang.org/scala3/reference/dropped-features/limit22.html
 
 :koresuki:
 
-### Dropped: private[this] and protected[this]
+## Dropped: private[this] and protected[this]
 
 https://docs.scala-lang.org/scala3/reference/dropped-features/this-qualifier.html
 
 
-# 気になった機能
+# その他気になった機能
 
 個人的にプロダクションコードではあまり使わない気がするけど、少し気になった機能のメモ。  
 
@@ -203,7 +233,4 @@ type Element[X] = X match {
 - Anyでmatchできなくなった
 - Matchable Traitなら出来る
 
-# 参考
 
-- https://docs.scala-lang.org/scala3/reference/index.html
-- https://docs.scala-lang.org/ja/scala3/new-in-scala3.html
