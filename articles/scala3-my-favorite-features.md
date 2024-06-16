@@ -232,7 +232,7 @@ https://docs.scala-lang.org/scala3/reference/other-new-features/open-classes.htm
 継承を許容するならopenを付ける必要があるとのこと。  
 scala-cliで実行する場合、-source:futureをつけないとコンパイルエラーにはなりませんでした。  
 
-```
+```scala
 scala-cli  -source:future -feature
 Welcome to Scala 3.4.2 (22.0.1, Java OpenJDK 64-Bit Server VM).
 Type in expressions for evaluation. Or try :help.
