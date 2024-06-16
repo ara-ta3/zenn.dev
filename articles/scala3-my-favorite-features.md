@@ -195,7 +195,7 @@ val res1: Int = 10
 https://docs.scala-lang.org/scala3/reference/other-new-features/opaques.html
 
 **これ！！！最高！！！**  
-Type Alaisでもコンパイルエラーになってくれます。  
+Type Aliasでもコンパイルエラーになってくれます。  
 めっちゃ欲しかった！  
 
 ```scala
