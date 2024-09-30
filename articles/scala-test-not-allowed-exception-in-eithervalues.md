@@ -1,9 +1,9 @@
 ---
-title: "ScalaTestのEitherValuesでvalueにアクセスしたらNotAllowedExceptionで怒られた話"
+title: "ScalaTestのEitherValuesでvalueに誤ったアクセスをしたら不意にNotAllowedExceptionで怒られた話"
 emoji: "👻"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Scala", "Test"]
-published: false
+published: true
 ---
 
 # 初めに結論
