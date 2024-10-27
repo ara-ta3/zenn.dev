@@ -15,7 +15,7 @@ API経由でデータのやり取りをする以外にReactやScalatra固有の�
 
 検証したコードはこちら  
 
-https://github.com/ara-ta3/api-scheme-definiton-getting-started
+https://github.com/ara-ta3/api-scheme-definiton-getting-started/tree/zenn-dev-20241027
 
 おおよそのやっていることはこんなイメージです。  
 (mermaidちょっと書きたかっただけな気持ちはある  
@@ -387,7 +387,7 @@ lazy val rootProject = project
 scalatra-jsonを使っていればcase classをjsonに変えてくれるので、scalatra自体の話は省略します。  
 実際のコードはこちらです。  
 
-https://github.com/ara-ta3/api-scheme-definiton-getting-started/blob/main/backend/src/main/scala/com/example/Scalatra.scala
+https://github.com/ara-ta3/api-scheme-definiton-getting-started/blob/zenn-dev-20241027/backend/src/main/scala/com/example/Scalatra.scala
 
 
 ## sbt compile時にopenapiの依存が取得できないと怒られて困った話
