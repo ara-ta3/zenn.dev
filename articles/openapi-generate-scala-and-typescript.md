@@ -3,7 +3,7 @@ title: "OpenAPI generatorでTypeScriptとScalaのコードを生成してデー�
 emoji: "💨"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["openapi", "swagger", "scala", "typescript", "scalatra"]
-published: false
+published: true
 ---
 
 # 概要
