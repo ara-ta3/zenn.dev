@@ -10,7 +10,8 @@ published: true
 
 OpenAPIでSwaggerを使ってドキュメントは書いているのですが、自動生成までは試したことがなく、一度向き合ってみるかと思って試してみました。  
 フロントエンドは特に何も考えずTypeScript React、バックエンドにはScalaのマイクロフレームワークのScalatraを使っています。  
-(本当はKotlin Ktorをバックエンドにしようと思ったんですが、gradleにハマっているのかopenapi generatorにハマっているのかわからなかったので、それなりに書けるScalaにしたという背景があります。  
+本当はKotlin Ktorをバックエンドにしようと思っていました。  
+ただ、gradleにハマっているのかopenapi generatorにハマっているのかわからなかったので、それなりに書けるScalaを採用したという背景があります。  
 API経由でデータのやり取りをする以外にReactやScalatra固有の何かは特段使っていません。  
 
 検証したコードはこちら  
@@ -18,7 +19,7 @@ API経由でデータのやり取りをする以外にReactやScalatra固有の�
 https://github.com/ara-ta3/api-scheme-definiton-getting-started/tree/zenn-dev-20241027
 
 おおよそのやっていることはこんなイメージです。  
-(mermaidちょっと書きたかっただけな気持ちはある  
+(mermaidちょっと書きたかっただけな気持ちはある)  
 
 ```mermaid
 graph LR
@@ -267,7 +268,7 @@ lazy val openapi = project.in(file("openapi-generated"))
 
 #### openApiConfigFile による設定内容の別ファイルへの出力
 
-この設定は `openApiConfigFile := "config.yaml"` のようにyaml形式のファイルに書いたうえでそのパスを指定することも可能です。  
+この設定は `openApiConfigFile := "config.yaml"` のようにyaml形式のファイルに書いたうえでそのパスを指定できます。  
 が、分ける理由も特にないかなと思って分けていません。  
 
 #### openApiIgnoreFileOverride と openapi-ignore-file
