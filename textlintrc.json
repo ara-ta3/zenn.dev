@@ -26,7 +26,6 @@
             },
             "no-nfd": true,
             "no-hankaku-kana": true,
-            "ja-no-successive-word": true,
             "ja-no-abusage": true,
             "ja-no-redundant-expression": true,
             "ja-unnatural-alphabet": true,
