@@ -1,0 +1,41 @@
+{
+    "rules": {
+        "spellcheck-tech-word": true,
+        "preset-ja-technical-writing": {
+            "preset-ja-spacing": false,
+            "sentence-length": {
+                "max": 150
+            },
+            "max-comma": {
+                "max": 3
+            },
+            "max-kanji-continuous-len": {
+                "max": 6
+            },
+            "no-mix-dearu-desumasu": {
+                "preferInHeader": "",
+                "preferInBody": "ですます",
+                "preferInList": "である",
+                "strict": true
+            },
+            "no-double-negative-ja": true,
+            "no-dropping-the-ra": true,
+            "no-doubled-conjunctive-particle-ga": true,
+            "no-doubled-joshi": {
+                "min_interval": 1
+            },
+            "no-nfd": true,
+            "no-hankaku-kana": true,
+            "ja-no-successive-word": true,
+            "ja-no-abusage": true,
+            "ja-no-redundant-expression": true,
+            "ja-unnatural-alphabet": true,
+            "no-exclamation-question-mark": false,
+            "ja-no-mixed-period": false,
+            "ja-no-weak-phrase": false,
+            "max-ten": {
+                "max": 5
+            }
+        }
+    }
+}
