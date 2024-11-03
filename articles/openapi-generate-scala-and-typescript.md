@@ -10,7 +10,8 @@ published: true
 
 OpenAPIでSwaggerを使ってドキュメントは書いているのですが、自動生成までは試したことがなく、一度向き合ってみるかと思って試してみました。  
 フロントエンドは特に何も考えずTypeScript React、バックエンドにはScalaのマイクロフレームワークのScalatraを使っています。  
-(本当はKotlin Ktorをバックエンドにしようと思ったんですが、gradleにハマっているのかopenapi generatorにハマっているのかわからなかったので、それなりに書けるScalaにしたという背景があります。  
+本当はKotlin Ktorをバックエンドにしようと思っていました。  
+ただ、gradleにハマっているのかopenapi generatorにハマっているのかわからなかったので、それなりに書けるScalaを採用したという背景があります。  
 API経由でデータのやり取りをする以外にReactやScalatra固有の何かは特段使っていません。  
 
 検証したコードはこちら  
@@ -18,7 +19,7 @@ API経由でデータのやり取りをする以外にReactやScalatra固有の�
 https://github.com/ara-ta3/api-scheme-definiton-getting-started/tree/zenn-dev-20241027
 
 おおよそのやっていることはこんなイメージです。  
-(mermaidちょっと書きたかっただけな気持ちはある  
+(mermaidちょっと書きたかっただけな気持ちはある)  
 
 ```mermaid
 graph LR
@@ -244,7 +245,7 @@ sbt-openapi-generatorというのがあって、3 weeks agoにもリリースが
 
 https://github.com/OpenAPITools/sbt-openapi-generator
 
-一つのプロジェクトに混在させることも可能ですが、分かれていたほうが触ってもいいか触らないほうがいいかがわかりやすいと思うので、プロジェクトを分ける設定にしました。  
+1つのプロジェクトに混在させることも可能ですが、分かれていたほうが触ってもいいか触らないほうがいいかがわかりやすいと思うので、プロジェクトを分ける設定にしました。  
 
 backend/build.sbt
 
@@ -267,7 +268,7 @@ lazy val openapi = project.in(file("openapi-generated"))
 
 #### openApiConfigFile による設定内容の別ファイルへの出力
 
-この設定は `openApiConfigFile := "config.yaml"` のようにyaml形式のファイルに書いたうえでそのパスを指定することも可能です。  
+この設定は `openApiConfigFile := "config.yaml"` のようにyaml形式のファイルに書いたうえでそのパスを指定できます。  
 が、分ける理由も特にないかなと思って分けていません。  
 
 #### openApiIgnoreFileOverride と openapi-ignore-file
@@ -430,7 +431,7 @@ Scalaのバージョンが3系統なら `"openapi" % "openapi_3",` を追加し�
 
 # まとめ
 
-- openapi.ymlからまずはWebAPIのインタフェースを生成してデータのやり取りをできるようにしました
+- openapi.ymlからまずはWeb APIのインタフェースを生成してデータのやり取りをできるようにしました
 - もうちょっと使い込むと困りごととか出てくる気はするので使い込みたい
 
 ## 参考
