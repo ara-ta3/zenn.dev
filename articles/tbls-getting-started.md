@@ -58,6 +58,9 @@ docPath: dbdocs
 ```
 
 この状態で`tbls doc`コマンドを叩けばドキュメントがdbdocsディレクトリに生成されます。  
+下記URLにあるようにREADME.mdが全体像で、各々のテーブルに関するドキュメントがテーブル名.mdというファイル(users.mdなど)が生成されます。  
+
+https://github.com/ara-ta3/tbls-getting-started/blob/main/dbdocs/README.md
 
 # viewpointsを使って複数テーブルについてのドキュメントを生成する
 
@@ -104,7 +107,8 @@ viewpoints:
           - users
 ```
 
-結果として https://github.com/ara-ta3/tbls-getting-started/blob/main/dbdocs/viewpoint-0.md のようなマークダウン形式のドキュメントが生成されます。  
+結果として下記URLのようなマークダウン形式のドキュメントが生成されます。  
+https://github.com/ara-ta3/tbls-getting-started/blob/main/dbdocs/viewpoint-0.md  
 viewpoint毎に生成されるので、上記設定の場合viewpoint-0.md、viewpoint-1.md、viewpoint-2.mdが生成されました。  
 Descriptionが主な説明となりますが、Commentsもテーブルやカラムへのコメントがなくても設定ファイルに記述することでコメントをドキュメントに表示できるようなので、それも合わせると良いでしょう。  
 
