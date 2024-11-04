@@ -105,7 +105,7 @@ viewpoints:
 ```
 
 結果として https://github.com/ara-ta3/tbls-getting-started/blob/main/dbdocs/viewpoint-0.md のようなマークダウン形式のドキュメントが生成されます。  
-viewpoint毎に生成されるので、上記設定であればviewpoint-0.md、viewpoint-1.md、viewpoint-2.mdが生成されました。  
+viewpoint毎に生成されるので、上記設定の場合viewpoint-0.md、viewpoint-1.md、viewpoint-2.mdが生成されました。  
 Descriptionが主な説明となりますが、Commentsもテーブルやカラムへのコメントがなくても設定ファイルに記述することでコメントをドキュメントに表示できるようなので、それも合わせると良いでしょう。  
 
 # 差分が出たときの対応
