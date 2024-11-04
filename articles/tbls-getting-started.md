@@ -12,8 +12,7 @@ https://github.com/ara-ta3/tbls-getting-started
 
 # 前提
 
-テーブル構成
-TODO: Repositoryから参照できないかな
+![](/images/tbls/schema.png)
 
 # tblsについて
 
