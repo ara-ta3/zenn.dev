@@ -165,6 +165,7 @@ lint:
 ```
 
 これによりもし新しくテーブルが追加された場合、下記のようにエラーに倒すことが出来ます。  
+下記はuser_informationというテーブルを新しく追加した場合の例になります。  
 
 https://github.com/ara-ta3/tbls-getting-started/pull/2
 https://github.com/ara-ta3/tbls-getting-started/actions/runs/11658871811/job/32458550009
@@ -189,6 +190,7 @@ make: *** [Makefile:46: lint] Error 1
 
 diffについては特に指定がない場合、現在生成されているドキュメントとDBの設定の差分を見てくれます。  
 なので例えばカラムを追加した場合に差分が発生するので、これもCI含めておくとドキュメントのメンテナンス漏れを防ぐことが出来るでしょう。  
+下記はusersテーブルにregistered_atというカラムを追加した場合の例になります。  
 
 https://github.com/ara-ta3/tbls-getting-started/pull/1
 https://github.com/ara-ta3/tbls-getting-started/actions/runs/11658830171
