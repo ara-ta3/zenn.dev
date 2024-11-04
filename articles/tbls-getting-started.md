@@ -10,7 +10,7 @@ published: false
 
 https://github.com/ara-ta3/tbls-getting-started
 
-# 前提
+# 例として使うテーブル構成
 
 ECサイトっぽいテーブルを例として作ってみました。  
 せっかくなのでtblsで生成したものをmarkdownへのリンクを省いて表で持ってきています。  
@@ -273,5 +273,6 @@ make: *** [Makefile:49: diff] Error 1
 
 # 参考
 
-- https://zenn.dev/ara_ta3/scraps/fd7b61abd81438
-- https://zenn.dev/micin/articles/8b64c7460d68a8
+https://zenn.dev/micin/articles/8b64c7460d68a8
+https://zenn.dev/ara_ta3/scraps/fd7b61abd81438
+https://github.com/ara-ta3/tbls-getting-started
