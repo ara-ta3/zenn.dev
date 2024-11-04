@@ -3,7 +3,7 @@ title: "tblsを使ってMySQLの複数テーブルについてのドキュメン
 emoji: "📝"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["tbls", "mysql", "document"]
-published: false
+published: true
 ---
 
 今回使ったコードはここに置いてあります。  
