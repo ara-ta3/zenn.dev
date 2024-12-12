@@ -8,7 +8,7 @@ published: true
 
 # はじめに
 
-この記事はシェルスクリプト＆PowerShell Advent Calendar 2024の14日目として書かれています。  
+この記事はシェルスクリプト＆PowerShell Advent Calendar 2024の12日目として書かれています。  
 
 https://qiita.com/advent-calendar/2024/shell
 
@@ -19,6 +19,17 @@ https://github.com/bats-core/bats-core
 BatsはBash用のテストフレームワークです。  
 何らかのプログラミング言語で書くまででもない簡単なスクリプトを書こうと思った際に、とはいえテストが欲しいと思って見つけたのがBatsでした。  
 今回は簡単なBatsのテストコードの紹介をします。  
+
+書いたコードはここに置いています。  
+https://gist.github.com/ara-ta3/df3bbd45b916bc137fb6196ce2e213d9
+
+今回使用したbatsコマンドはHomebrewで入れており、バージョンは1.11.0です。  
+https://formulae.brew.sh/formula/bats-core
+
+```bash
+> bats --version
+Bats 1.11.0
+```
 
 # シンプルなテストコード
 
@@ -274,4 +285,5 @@ https://bats-core.readthedocs.io/en/stable/tutorial.html#quick-installation
 
 - シェルスクリプトを書いたときにテストするならBatsが便利
 - ~~規模が大きくなるならGoとかのほうがいいのでは~~
+- 簡単に書けるのでちょっと雑に書いたスクリプトなどで使っていきたい
 
