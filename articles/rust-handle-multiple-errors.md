@@ -18,7 +18,7 @@ Rust では、エラーが起こり得る処理を続けて書く際、 `?` を�
 # サンプルコード
 
 今回は以下のような 100 と書かれたファイルを読み込んで数字に変換し、println で表示するというコードを例として使います。
-ファイルの読み込み時に std::io::Error、文字列の変換時に std::num::ParseIntError が返りえます。
+ファイルの読み込み時に `std::io::Error` 、文字列の変換時に `std::num::ParseIntError` が返りえます。
 
 ```rust
 use std::fs::File;
@@ -69,7 +69,7 @@ error[E0277]: `?` couldn't convert the error to `std::io::Error`
    = note: required for `Result<i32, std::io::Error>` to implement `FromResidual<Result<Infallible, ParseIntError>>`
 ```
 
-io:Error を期待しているはずですが、std::num::ParseIntError を返そうとしており、From トレイトが存在しないため返り値として期待される型にできず、コンパイルが通りません。
+`std::io:Error` を期待しているはずですが、`std::num::ParseIntError` を返そうとしており、From トレイトが存在しないため返り値として期待される型にできず、コンパイルが通りません。
 
 :::message
 ?を使用した際に From トレイトが実装されていると自動的に必要な型へと変換してくれます。
@@ -91,7 +91,7 @@ io:Error を期待しているはずですが、std::num::ParseIntError を返�
 
 ## map_err で型変換する
 
-数字の変換の失敗が std::io::Error が妥当かどうかは置いといて、型パズルします。
+数字の変換の失敗が `std::io::Error` が妥当かどうかは置いといて、型パズルします。
 それはそうという感じですが、型がとりあえず合うのでコンパイルを通したいという思いは通ります。
 
 ```rust
@@ -103,7 +103,7 @@ io:Error を期待しているはずですが、std::num::ParseIntError を返�
 
 ## カスタムエラーを From トレイトと共に実装する
 
-自前のカスタムエラーを定義し、std::io::Error と std:num::ParseIntError をそのカスタムエラーへと変換する From トレイトを用意し、返り値の型をカスタムエラーにすればコンパイルを通すことができます。
+自前のカスタムエラーを定義し、`std::io::Error` と `std:num::ParseIntError` をそのカスタムエラーへと変換する From トレイトを用意し、返り値の型をカスタムエラーにすればコンパイルを通すことができます。
 
 ```rust
 use std::fs::File;
@@ -249,7 +249,7 @@ fn main() {
 ## anyhow を使う
 
 anyhow は異なるエラー型を扱いながら、詳細なエラー情報を簡単に付加できるとても便利なライブラリです。
-std::io::Error など標準で提供されているエラー型の変換などもやってくれるので、anyhow::Result 型を返すように定義すると楽に書けそうでした。
+`std::io::Error` など標準で提供されているエラー型の変換などもやってくれるので、`anyhow::Result` 型を返すように定義すると楽に書けそうでした。
 
 https://docs.rs/anyhow
 
