@@ -1,5 +1,5 @@
 ---
-title: "プログラミングRust 7章を参考に複数種類エラー対応の理解を深める"
+title: "プログラミングRust 7章を参考に複数種類のエラーをハンドリングする"
 emoji: "🕌"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Rust", "error", "anyhow"]
