@@ -2,8 +2,8 @@
 title: "プログラミングRust 7章を参考に複数種類のエラーをハンドリングする"
 emoji: "🕌"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["Rust", "error", "anyhow"]
-published: false
+topics: ["Rust", "error", "anyhow", "thiserror"]
+published: true
 ---
 
 この記事は Rust Advent Calendar 2024 の 9 日目として書いています。  
