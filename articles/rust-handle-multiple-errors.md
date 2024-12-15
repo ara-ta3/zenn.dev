@@ -103,7 +103,7 @@ error[E0277]: `?` couldn't convert the error to `std::io::Error`
 
 ## カスタムエラーを From トレイトと共に実装する
 
-自前のカスタムエラーを定義し、`std::io::Error` と `std:num::ParseIntError` をそのカスタムエラーへと変換する From トレイトを用意し、返り値の型をカスタムエラーにすればコンパイルを通すことができます。
+自前のカスタムエラーを定義し、`std::io::Error` と `std::num::ParseIntError` をそのカスタムエラーへと変換する From トレイトを用意し、返り値の型をカスタムエラーにすればコンパイルを通すことができます。
 
 ```rust
 use std::fs::File;
