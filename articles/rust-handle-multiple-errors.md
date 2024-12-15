@@ -1,6 +1,6 @@
 ---
 title: "プログラミングRust 7章を参考に複数種類のエラーをハンドリングする"
-emoji: "🕌"
+emoji: "🦀"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Rust", "error", "anyhow", "thiserror"]
 published: true
