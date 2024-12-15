@@ -312,7 +312,7 @@ fn main() {
 }
 ```
 
-txt ファイルに hoge という文字列がある場合に下記のようにメッセージを出してくれるので便利です。
+txt ファイルに hoge という文字列がある場合に下記のようにメッセージを出してくれました。
 
 ```bash
 Failed to parse number from: 'hoge'
