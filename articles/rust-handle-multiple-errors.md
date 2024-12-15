@@ -69,7 +69,7 @@ error[E0277]: `?` couldn't convert the error to `std::io::Error`
    = note: required for `Result<i32, std::io::Error>` to implement `FromResidual<Result<Infallible, ParseIntError>>`
 ```
 
-`std::io:Error` を期待しているはずですが、`std::num::ParseIntError` を返そうとしており、From トレイトが存在しないため返り値として期待される型にできず、コンパイルが通りません。
+`std::io::Error` を期待しているはずですが、`std::num::ParseIntError` を返そうとしており、From トレイトが存在しないため返り値として期待される型にできず、コンパイルが通りません。
 
 :::message
 ?を使用した際に From トレイトが実装されていると自動的に必要な型へと変換してくれます。
