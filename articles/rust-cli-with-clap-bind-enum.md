@@ -3,7 +3,7 @@ title: "Rustのclapでcliのコマンドやオプションをenumで取得する
 emoji: "🦀"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["rust", "clap", "cli"]
-published: false
+published: true
 ---
 
 # Rust Advent Calendar 2024 19 日目
