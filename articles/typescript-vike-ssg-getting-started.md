@@ -19,7 +19,7 @@ https://vite-plugin-ssr.com/
 今回は TypeScript + React ベースのページを Vike を使って静的ファイルにして生成してみます。
 
 :::message
-`vike-react` という拡張を使えば不要な部分がありますが、vike の理解を深めるために一旦使わずに書いています。
+`vike-react` という拡張を使えば不要な部分がありますが、vike の理解を深めるべく一旦使わずに書いています。
 
 https://github.com/vikejs/vike-react
 :::
@@ -230,7 +230,7 @@ tree -I node_modules -I dist
 
 SSG やるなら当然 meta タグなどを URL 毎に変更したくなるのでそれをやります。  
 `src/renderer/+config.ts` に対して、config に title を持たせられるように設定し、`src/pages/+config.ts` で 具体的な title を設定します。
-`src/renderer/+onRenderHtml.tsx` にすでに記述してしまっていましたが、title を `pageContext.config.title` から取得して head タグに埋め込むようにしているという前提も含んでいます。
+`src/renderer/+onRenderHtml.tsx` へと既に記述してしまっていましたが、title を `pageContext.config.title` から取得して head タグへ埋め込むようにしているという前提も含んでいます。
 
 src/renderer/+config.ts
 
