@@ -19,7 +19,7 @@
   "homepage": "https://github.com/ara-ta3/zenn.dev#readme",
   "dependencies": {
     "textlint": "14.4.2",
-    "textlint-rule-preset-ja-technical-writing": "10.0.1",
+    "textlint-rule-preset-ja-technical-writing": "12.0.2",
     "textlint-rule-spellcheck-tech-word": "5.0.0",
     "zenn-cli": "0.1.158"
   }
