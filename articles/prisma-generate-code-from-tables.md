@@ -9,9 +9,9 @@ published: false
 # 背景と概要
 
 発端は既存のテーブル構成からORMっぽい役割のコードを生成できないかと思って探していました。  
-その時はScala(scalikejdbc)のコードだったのでscalikejdbc-mapper-generatorというのを使おうとしていましたが、調べている間にPrismaの名前を見て、前知り合いが発表していたなと思い検証してみました。その時の備忘録です。  
+調べている間にPrismaの名前を見て、前知り合いが発表していたなと思い検証してみました。その時の備忘録です。  
 
-検証したコードなどはこちらにあります。  
+検証したコードなどはこちらです。  
 
 https://zenn.dev/ara_ta3/scraps/45124487a548ee
 
@@ -24,19 +24,14 @@ PrismaはNode.js用のORMですが、schema.prismaという固有のスキーマ
 
 https://www.prisma.io/
 
-ちょっと前に見た知り合いの発表資料のslide 45のPrisma ORMの仕組みのページがわかりやすいのでおすすめです。  
-
-https://speakerdeck.com/hoto17296/orm-toxiang-kihe-u?slide=45
-
 # 目次
 
 - 既存のテーブル定義からスキーマファイルを生成する
-- スキーマファイルから「テーブルデータをマッピングするクラス」を生成するコードを書く
+- スキーマファイルから「テーブルのデータをマッピングするクラス」を生成するコードを書く
 - 「テーブルデータをマッピングするクラス」を生成してみる
 
-
 マッピングするクラスはScalaのコードにしたかったので、Scalaのコードを生成してみます。  
-後に出てくるコードを見るとわかりますが、JavaScript(TypeScript)で生成するコードを書くので、任意のファイルを生成できるため、Scalaに限った話ではありません。  
+後に出てくるコードを見るとわかりますが、JavaScript(TypeScript)で生成するコードを書くので、任意のファイルが生成可能で、Scalaに限った話ではありません。  
 
 
 # 既存のテーブル定義からスキーマファイルを生成する
@@ -47,5 +42,7 @@ https://speakerdeck.com/hoto17296/orm-toxiang-kihe-u?slide=45
 
 # 「テーブルデータをマッピングするクラス」を生成してみる
 
- 
 
+# 参考
+
+- https://speakerdeck.com/hoto17296/orm-toxiang-kihe-u
