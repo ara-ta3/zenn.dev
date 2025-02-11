@@ -3,7 +3,7 @@ title: "Prismaを使って既存のテーブルスキーマからコードを生
 emoji: "✨"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["prisma", "mysql"]
-published: false
+published: true
 ---
 
 # 背景と概要
