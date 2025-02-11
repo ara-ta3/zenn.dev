@@ -8,7 +8,7 @@ published: false
 
 # 背景と概要
 
-発端は既存のテーブル構成からORMっぽい役割のコードを生成できないかと思って探していました。  
+発端は既存のテーブル構成からO/Rマッパーっぽい役割のコードを生成できないかと思って探していました。  
 調べている間にPrismaの名前を見て、前知り合いが発表していたなと思い検証してみました。その時の備忘録です。  
 マッピングするクラスはScalaのコードにしたかったので、Scalaのコードを生成してみます。  
 後に出てくるコードを見るとわかりますが、JavaScript(TypeScript)で生成するコードを書くので、任意のファイルが生成可能で、Scalaに限った話ではありません。  
@@ -31,7 +31,7 @@ https://github.com/ara-ta3/prisma-scala-gettingstarted
 
 # Prismaとは
 
-PrismaはNode.js用のORMですが、schema.prismaという固有のスキーマファイルを生成し、それを元にDBマイグレーションやコード生成などを行えるという特徴があります。  
+PrismaはNode.js用のO/Rマッパーですが、schema.prismaという固有のスキーマファイルを生成し、それを元にDBマイグレーションやコード生成などを行えるという特徴があります。  
 当然TypeScript / JavaScriptの生成もできるのですが、独自のジェネレータを書くことによって、TypeScript / JavaScript以外の言語のコード生成も可能というのも1つの利点です。  
 
 https://www.prisma.io/
@@ -230,7 +230,7 @@ model users {
 やることは以下の通りです。  
 
 - prisma/scala-generator.jsを書く
-    - ここのファイル名はなんでもいいです
+    - ここのファイル名に関して特に決まりはありません
 - prisma/schema.prismaにgeneratorブロックを書く
 
 ## prisma/scala-generator.jsを書く
