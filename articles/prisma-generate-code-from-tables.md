@@ -2,7 +2,7 @@
 title: "Prismaを使って既存のテーブルスキーマからコードを生成する"
 emoji: "✨"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["prisma", "mysql"]
+topics: ["prisma", "mysql", "typescript", "javascript"]
 published: true
 ---
 
