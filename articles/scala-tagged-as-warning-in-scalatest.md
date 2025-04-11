@@ -6,7 +6,7 @@ topics: ["scala", "scalatest", "scala3"]
 published: true
 ---
 
-タイトルの長さが70文字らしいので適度に省略してしまったのですが、以下の警告が出て、調べたときの備忘録です。  
+タイトルの長さが70文字らしいので適度に省略してしまったのですが、ScalaTest実行時に警告が出て、調べたときの備忘録です。  
 Scalaは2.13.13  
 ScalaTestは3.2.18  
 scalacOptionsに-Xlintを入れています。  
