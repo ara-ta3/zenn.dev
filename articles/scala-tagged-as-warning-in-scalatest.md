@@ -97,7 +97,7 @@ class TaggedAsSpec extends AnyFreeSpec {
 [info] All tests passed.
 ```
 
-ここで `"警告が出る書き方" taggedAs (CustomTag1, CustomTag2)` としているとinfix operatorによるメソッド呼び出しになっており、  
+ここで `"警告が出る書き方" taggedAs (CustomTag1, CustomTag2)` としているとinfix operatorによるメソッド呼び出しになり、  
 この引数が複数になる場合Scala3では禁止する方向性なため、Scala2.13では警告が出るようになったというのが理由でした。  
 したがって、infix operatorではなく`"警告が出ない書き方".taggedAs(CustomTag1, CustomTag2)`のように.を用いて呼ぶようにすれば警告は出なくなるということになります。  
 
@@ -113,7 +113,7 @@ https://contributors.scala-lang.org/t/multiarg-infix-application-considered-wart
 autotuplingも廃止の方向性がありそうでしたが、残す方向性になったようです。  
 https://contributors.scala-lang.org/t/lets-drop-auto-tupling/1799/24
 
-最終的にScala3でinfixで書きたい場合は明示的にinfixと書くようになったみたいです。  
+最終的にScala3においてinfixで書きたい場合は明示的にinfixと書くようになったみたいです。  
 https://docs.scala-lang.org/scala3/reference/changed-features/operators.html
 
 
