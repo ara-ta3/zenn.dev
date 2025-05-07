@@ -1,20 +1,30 @@
 ---
-title: "Ubuntu に Ollama と Open WebUI をインストールして、ChatGPT 風のローカル対話環境を構築する"
+title: "UbuntuにOllamaとOpen WebUIをインストールして、ChatGPT風のローカル対話環境を構築する"
 emoji: "💻"
 type: "tech"
-topics: ["Ollama", "Open WebUI", "Ubuntu", "ChatGPT"]
+topics: ["Ollama", "OpenWebUI", "Ubuntu"]
 published: false
 ---
 
 ## はじめに
 
-本記事では、Ubuntu 環境に Ollama と Open WebUI をインストールし、ChatGPT のようなローカル対話環境を構築する方法を解説します。Ollama は、様々な LLM（Large Language Model）をローカルで実行できるツールです。Open WebUI は、Ollama を Web UI 経由で利用するためのインターフェースを提供します。
+この記事では、Ubuntu 環境に Ollama と Open WebUI をインストールし、ChatGPT のようなローカル対話環境を構築する方法を備忘録がてら紹介します。  
+Ollama は、様々な LLM をローカルで実行できるツールであり、Open WebUI は、Ollama を Web UI 経由で利用するためのインターフェースを提供します。
 
 ## 前提条件
 
-- Ubuntu 20.04 以降がインストールされていること
-- インターネット接続があること
-- sudo 権限があること
+以下の環境で動作確認を行っています。
+ubuntu とは言っていますが、Mac mini 2018 に ubuntu を入れているので超貧弱です。
+
+```bash
+lsb_release -d
+Description:	Ubuntu 24.04 LTS
+```
+
+```bash
+ollama --version
+ollama version is 0.6.8
+```
 
 ## 手順
 
@@ -32,45 +42,60 @@ curl -L https://ollama.ai/install.sh | bash
 ollama --version
 ```
 
+Ollama で利用するモデルは、[ollama.com](https://ollama.com/) から探して、`ollama pull <model_name>` または `ollama run <model_name>` で取得できます。
+
+https://ollama.com/
+
+例:
+
+```bash
+ollama pull phi4
+ollama run phi4
+
+ollama pull gemma3
+ollama run gemma3
+```
+
 ### 2. Open WebUI のインストール
 
-次に、Open WebUI をインストールします。Open WebUI は Docker コンテナとして提供されているため、Docker がインストールされている必要があります。Docker がインストールされていない場合は、以下のコマンドでインストールします。
+Open WebUI を起動します。
 
 ```bash
-sudo apt update
-sudo apt install docker.io
-sudo systemctl start docker
-sudo systemctl enable docker
+docker run -d -p 3000:8080  --add-host=host.docker.internal:host-gateway -v open-webui:/app/backend/data ghcr.io/open-webui/open-webui:main
 ```
 
-Docker がインストールされたら、Open WebUI を起動します。
+### 2.5. Docker 内部から Ollama に接続できない場合の対応
+
+Docker 内の Open WebUI から Ollama に接続できなかったので、Docker 内から curl を叩くことで疎通しているのかの確認を行いました。  
+結果として届いていないことがわかったので、それを許可する設定を追加しました。
+
+1.  Docker 内から Ollama に接続できるか確認します。
 
 ```bash
-docker run -d -p 3000:3000 --add-host=host.docker.internal:host-gateway --name openwebui --restart always ghcr.io/openwebui/openwebui:latest
+docker run --rm curlimages/curl http://172.17.0.1:11434
 ```
 
-### 3. Open WebUI へのアクセス
+2.  上記で接続できない場合、Ollama が外部からの接続を許可するように設定する必要があります。
 
-Open WebUI が起動したら、Web ブラウザで`http://localhost:3000`にアクセスします。
+`/etc/systemd/system/ollama.service` を編集し、`Environment="OLLAMA_HOST=0.0.0.0"` を追加します。
+検証するだけであれば `OLLAMA_HOST=0.0.0.0 ollama serve` でも良いでしょう。
 
-### 4. モデルのダウンロード
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart ollama
+```
 
-Open WebUI にアクセス後、Ollama で利用可能なモデルをダウンロードします。Open WebUI のインターフェースからモデルを選択し、ダウンロードできます。例えば、`llama2`などのモデルをダウンロードできます。
+:::message
+`OLLAMA_HOST=0.0.0.0` は接続元を全て許容するデバッグ用途なので、本番環境では適切な設定をしてください。
+:::
 
-### 5. チャットの開始
+### 3. Open WebUI の利用
 
-モデルのダウンロードが完了したら、Open WebUI のインターフェースからチャットを開始できます。
+Open WebUI が起動したら、Web ブラウザで`http://localhost:3000`にアクセスします。Open WebUI のインターフェースから、Ollama でダウンロード済みのモデルを選択し、チャットを開始できます。
 
-## トラブルシューティング
+## まとめと感想
 
-- **Open WebUI にアクセスできない場合:**
-  - Docker コンテナが正常に起動しているか確認してください。`docker ps`コマンドで確認できます。
-  - ファイアウォール設定を確認し、ポート 3000 へのアクセスが許可されているか確認してください。
-- **モデルのダウンロードに失敗する場合:**
-  - インターネット接続を確認してください。
-  - Ollama が正常に動作しているか確認してください。
-  - Open WebUI のログを確認し、エラーがないか確認してください。
-
-## まとめ
-
-本記事では、Ubuntu 環境に Ollama と Open WebUI をインストールし、ChatGPT のようなローカル対話環境を構築する方法を解説しました。この環境を利用することで、プライバシーを保護しながら、様々な LLM を試すことができます。
+Ubuntu 環境に Ollama と Open WebUI をインストールし、ChatGPT のようなローカル対話環境を構築する方法を解説しました。  
+そんなに強くない貧弱な PC に入れたので、予想通りではありますが、Response はそこまで早くないしあまり賢くはなかったです。
+Agent モードに使ったらどうかなーと思って色々試し始めましたが、今のところさすがに期待は出来ないかなぁという気持ちです。
+とはいえなにか面白い使い方が出てきたら試していきたいなぁと思いました。
