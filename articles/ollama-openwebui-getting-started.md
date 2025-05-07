@@ -2,7 +2,7 @@
 title: "UbuntuにOllamaとOpen WebUIをインストールして、ChatGPT風のローカル対話環境を構築する"
 emoji: "🦙"
 type: "tech"
-topics: ["Ollama", "Open WebUI", "Ubuntu"]
+topics: ["Ollama", "OpenWebUI", "Ubuntu"]
 published: true
 ---
 
