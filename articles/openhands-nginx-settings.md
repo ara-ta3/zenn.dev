@@ -1,5 +1,5 @@
 ---
-title: "openhandsのUIにnginx+mkcertでhttpsでアクセス出来るようにする"
+title: "OpenHandsのUIにnginx+mkcertでhttpsでアクセス出来るようにする"
 emoji: "🐙"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [openhands, nginx, mkcert, https]
@@ -8,21 +8,32 @@ published: false
 
 ## はじめに
 
-openhands の UI を HTTPS で安全に利用できるように、nginx と mkcert を使って設定する方法を紹介します。
+OpenHands を家庭用ネットワーク内の Ubuntu にホスティングし、nginx と mkcert を使って https 経由でアクセス出来るようにしたので、その時の備忘録がてら設定内容をメモします。
+前提として openhands.yourdomain.local というドメインに OpenHands と nginx をホスティングしています。
+この際に mkcert で証明書を発行し nginx に設定しつつ、アクセス元側ではその証明書を許容する設定をします。
 
-## 目次
+利用した OpenHands のバージョンは 0.36.0 です。
 
-- [mkcert のインストールと設定](#mkcertのインストールと設定)
-- [nginx の設定](#nginxの設定)
-- [openhands の UI へのアクセス確認](#openhandsのUIへのアクセス確認)
+```bash
+# 確認に利用したコマンド
+docker exec {container id} cat pyproject.toml|grep -m 1 -B 1 version
+name = "openhands-ai"
+version = "0.36.0"
+```
 
 ## mkcert のインストールと設定
 
-mkcert を使ってローカルで HTTPS の証明書を作成します。
+mkcert を利用し、ローカルで HTTPS の証明書を作成した後、アクセス元の Mac のキーチェインに証明書を追加します。  
+mkcert については別記事でも紹介しているのでそちらを参考にしてください。
+
+https://zenn.dev/ara_ta3/articles/mkcert-local-domain-https
+
+ざっとここでやることしては以下の通りです。
 
 ```bash
-# mkcertのインストール (例: macOS)
+# mkcertのインストール
 brew install mkcert
+sudo apt install mkcert
 
 # ローカルCA証明書のインストール
 mkcert -install
@@ -32,12 +43,26 @@ mkcert openhands.yourdomain.local
 ```
 
 mkcert コマンドを実行すると、`openhands.yourdomain.local.pem` と `openhands.yourdomain.local-key.pem` というファイルが生成されます。これらのファイルは、nginx の設定で使用します。
+このあとの nginx の設定では、 `/etc/nginx/certs/` ディレクトリにこのファイルを置くという前提で進めます。
+
+### Mac のキーチェインに証明書を追加
+
+ブラウザが警告を出さないようにするため、以下のコマンドで証明書をキーチェインに追加します。
+
+```bash
+sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain /path/to/rootCA.pem
+```
+
+:::message
+家庭用ネットワーク内で利用するなどの個人利用の前提でやっています。
+:::
 
 ## nginx の設定
 
-nginx の設定ファイルを作成し、HTTPS でアクセスできるように設定します。
+openhands.yourdomain.local へアクセスした際にリバースプロキシする設定と、websocket のための設定を nginx に記述します。  
+OpenHands はタスク指示の画面で WebSocket を利用するようなので、`/socket.io/` の設定が WebSocket 通信を可能にするため必要です。
 
-````nginx
+```nginx
 server {
     listen 443 ssl;
     listen 80;
@@ -61,20 +86,31 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 }
+```
 
-nginx の設定ファイルは、`/etc/nginx/conf.d/` などの場所に配置します。設定ファイルを配置したら、nginx を再起動して設定を反映させます。
+上記の設定ファイルを配置したら、nginx を再起動して設定を反映させます。
 
 ```bash
-sudo nginx -s reload
-````
+sudo systemctl reload nginx
+```
 
-## openhands の UI へのアクセス確認
+## OpenHands の UI へのアクセス確認
+
+:::message
+アクセス元の `/etc/hosts` に Ubuntu の IP と openhands.yourdomain.local のマッピングがある前提です。
+:::
 
 ブラウザで `https://openhands.yourdomain.local` にアクセスして、openhands の UI が表示されることを確認します。
+LLM や Git の API キーや Token の設定をした後に会話のページにて、下の方に　`クライアントの準備を待機中` などのメッセージが出てくると思います。  
+ここが最終的に `エージェントがユーザ入力を待機中...` までいけば準備は完了です。  
+このメッセージが出ないが、nginx を経由せずにポート指定したアプリケーションでは動くなどの場合、websocket 周りの設定が上手く行っていないかもしれません。
 
-もし表示されない場合は、以下の点を確認してください。
+バージョンが変わり、 websocket のパス変更がもし起きている場合は、Developers Console などでリクエストを見たりするのが良いかもしれません。
+今回使っているバージョンの 0.36.0 では `wss://openhands.yourdomain.local/socket.io/` を Develops Console の Network 内で見つけたため、websocket の設定を nginx へと 追加しています。
 
-- nginx の設定ファイルに誤りがないか
-- mkcert で生成された証明書のパスが正しいか
-- nginx が正しく起動しているか
-- ブラウザのキャッシュが残っていないか
+## まとめ
+
+仕事で使った Devin が便利だったので家で旧 OpenDevin という名の OpenHands を動かしてみました。
+OpenHands を nginx+https 経由で動く状態が作れました。
+まだ 0.36 というバージョンなこともあり過渡期だとは思いますが、Devin で感じた体験とはやはりまだ差があるなぁというのが感想です。
+今後もアップデートあると思うので楽しみながら触れて、機会があれば OSS への貢献も出来たらなという気持ちでいます。
