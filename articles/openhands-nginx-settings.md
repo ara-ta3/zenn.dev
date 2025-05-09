@@ -8,7 +8,7 @@ published: true
 
 ## はじめに
 
-OpenHands を家庭用ネットワーク内の Ubuntu にホスティングし、nginx と mkcert を使って https 経由でアクセス出来るようにしたので、その時の備忘録がてら設定内容をメモします。
+OpenHands を家庭内ネットワークの Ubuntu にホスティングし、nginx と mkcert を使って https 経由でアクセス出来るようにしたので、その時の備忘録がてら設定内容をメモします。
 前提として openhands.yourdomain.local というドメインに OpenHands と nginx をホスティングしています。
 この際に mkcert で証明書を発行し nginx に設定しつつ、アクセス元側ではその証明書を許容する設定をします。
 
@@ -21,9 +21,29 @@ name = "openhands-ai"
 version = "0.36.0"
 ```
 
+### OpenHands の実行
+
+前提として、Ubuntu 上では、以下のようなコマンドを実行し OpenHands を起動してあります。
+
+```bash
+docker run -it --rm -d --pull=always \
+    -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.36-nikolaik  \
+    -e LOG_ALL_EVENTS=true \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v ~/.openhands-state:/.openhands-state \
+    -p 3000:3000 \
+    --add-host host.docker.internal:host-gateway
+    --name openhands-app
+    docker.all-hands.dev/all-hands-ai/openhands:0.36
+
+# 1行コピペ用
+docker run -it --rm -d --pull=always -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.36-nikolaik -e LOG_ALL_EVENTS=true -v /var/run/docker.sock:/var/run/docker.sock -v ~/.openhands-state:/.openhands-state -p 3000:3000 --add-host host.docker.internal:host-gateway --name openhands-app docker.all-hands.dev/all-hands-ai/openhands:0.36
+```
+
 ## mkcert のインストールと設定
 
-mkcert を利用し、ローカルで HTTPS の証明書を作成した後、アクセス元の Mac のキーチェインに証明書を追加します。  
+まずは https でアクセスするための証明書の発行を行います。  
+mkcert を利用し、ローカルで https の証明書を作成した後、アクセス元の Mac のキーチェインに証明書を追加します。  
 mkcert については別記事でも紹介しているのでそちらを参考にしてください。
 
 https://zenn.dev/ara_ta3/articles/mkcert-local-domain-https
