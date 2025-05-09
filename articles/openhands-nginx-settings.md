@@ -3,7 +3,7 @@ title: "OpenHandsのUIにnginx+mkcertでhttpsでアクセス出来るように�
 emoji: "🐙"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: [openhands, nginx, mkcert, https]
-published: false
+published: true
 ---
 
 ## はじめに
