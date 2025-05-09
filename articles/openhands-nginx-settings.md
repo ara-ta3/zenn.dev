@@ -42,7 +42,7 @@ docker run -it --rm -d --pull=always -e SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.a
 
 ## mkcert のインストールと設定
 
-まずは https でアクセスするための証明書の発行を行います。  
+まずは https でアクセスするための証明書の発行します。  
 mkcert を利用し、ローカルで https の証明書を作成した後、アクセス元の Mac のキーチェインに証明書を追加します。  
 mkcert については別記事でも紹介しているのでそちらを参考にしてください。
 
