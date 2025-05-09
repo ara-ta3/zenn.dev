@@ -1,5 +1,5 @@
 ---
-title: "家のネットワーク内で.localドメインをhttpsでアクセスできるように証明書の設定をする"
+title: "家のネットワーク内で.localドメインをhttpsで通信できるようにmkcertで証明書の設定をする"
 emoji: "🔒"
 type: "tech"
 topics: ["mkcert", "https"]
@@ -8,48 +8,44 @@ published: false
 
 ## はじめに
 
-ローカルネットワーク内で、`.local`ドメインを使用して HTTPS 通信を実現する方法について解説します。mkcert というツールを使用することで、簡単に自己署名証明書を作成し、安全な通信を確立できます。
-
-今回のケースでは、Ubuntu 上にポート 3000 で起動した Web サービスがあり、それを Mac から HTTPS 経由でアクセスする状況を想定します。
+自宅などのローカルネットワーク内で、`.local`ドメインを使用しているのですが、https で通信をしたくなりました。  
+探してみたら mkcert を使うと楽に出来そうだったのでやってみたときの備忘録です。  
+今回のケースでは、Ubuntu 上にポート 3000 で起動したウェブサービスがあり、それを Mac からアクセスする状況を想定します。
 
 ### 概要
 
-1.  **Ubuntu の設定:**
-    - `mkcert` を使用して証明書を生成します。
-    - Web サービス (例: Node.js アプリ、Python Flask アプリ) をポート 3000 で実行します。
-    - nginx などの Web サーバーを設定して、HTTPS リクエストを処理し、ポート 3000 のサービスにプロキシします。
-2.  **Mac の設定:**
-    - Mac の `/etc/hosts` ファイルに、`.local` ドメインを Ubuntu の IP アドレスにマッピングするエントリを追加します。
-    - ブラウザで HTTPS 経由で Web サービスにアクセスします (例: `https://yourdomain.local`)。
+1.  Ubuntu の設定
+    - `mkcert` を使用して証明書を生成
+    - ウェブサービス (例: Node.js アプリ、Python Flask アプリ) をポート 3000 で実行
+    - nginx にウェブサービスと証明書の設定
+2.  Mac の設定
+    - `/etc/hosts` ファイルに、`.local` ドメインの設定
+    - 証明書を信頼するための設定
+    - ブラウザでウェブサービスにアクセス (例: `https://yourdomain.local`)
 
 ## 証明書の生成
 
 ### mkcert のインストール
 
-`mkcert` は、自己署名証明書の作成を簡素化するツールです。以下を使用してインストールします。
+`mkcert` は、自己署名の証明書の作成を簡素化するツールです。
+以下を使用してインストールします。
 
 ```bash
-# macOS (Homebrew を使用)
-brew install mkcert
-
-# Debian/Ubuntu
 sudo apt install mkcert
 ```
 
-`.local` ドメインの証明書を生成するには、`mkcert` を使用します。`yourdomain.local` を実際のドメイン名に置き換えてください。
+`mkcert` コマンドを用いて `.local` ドメインの証明書を生成します。
 
 ```bash
 mkcert -install
 mkcert yourdomain.local
 ```
 
-これにより、必要な証明書が作成され、CA 証明書がシステムのトラストストアにインストールされます。
+これにより、必要な証明書が作成されます。
 
 ## nginx の設定例
 
-### バックエンドサービスへのプロキシ (Node.js、Python など)
-
-この設定は、`localhost:3000` で実行されているバックエンドサービスにリクエストをプロキシします。
+この設定は、`localhost:3000` で実行されているバックエンドサービスにリクエストをプロキシするという例です。
 
 ```nginx
 server {
@@ -66,15 +62,33 @@ server {
 }
 ```
 
-バックエンドサービスがポート 3000 で実行されていることを前提としています。必要に応じて、`proxy_pass` ディレクティブを調整してください。
+certs ファイルはどこでもいいですが、私は `/etc/nginx/certs` ディレクトリを作成して置くことにしました。
 
 ## ブラウザの信頼
 
-証明書は自己署名されているため、ブラウザは接続がプライベートではないことを警告する可能性があります。Ubuntu 側で生成した mkcert のルート証明書を Mac のキーチェーンに登録することで、この警告を回避できます。
+証明書は自己署名なので、ブラウザが警告を出してくるはずです。  
+正しい挙動なのですが、家のネットワーク内の想定しているリクエストでは出ないようにしたいというのが今回やりたかったことなので、これを Mac のキーチェインに登録し警告を回避する設定をします。
 
-1.  Ubuntu 側で、mkcert のルート証明書を取得します。mkcert は、ルート証明書の場所を`CAROOT`環境変数で定義しています。通常は、`/usr/local/share/mkcert/rootCA.pem`にあります。
-2.  Ubuntu から Mac に、この`rootCA.pem`ファイルを安全な方法（例：scp、sftp）でコピーします。
-3.  Mac のターミナルで、以下のコマンドを実行して、キーチェーンに証明書を追加します。
+1.  Ubuntu 側で、mkcert のルート証明書を取得
+
+場所は `mkcert -CAROOT` コマンドで確認できます。
+
+```bash
+mkcert -CAROOT
+/home/myuser/.local/share/mkcert
+```
+
+2.  Ubuntu から Mac に、この`rootCA.pem`ファイルを安全な方法（例：scp、sftp）でコピー
+
+Mac 側からの実行の想定です。
+
+```bash
+scp yourdomain.local:/home/myuser/.local/share/mkcert/rootCA.pem ./
+```
+
+3.  キーチェインに証明書を追加
+
+Mac のターミナルで、以下のコマンドを実行して、キーチェインに証明書を追加します。
 
 ```bash
 sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain /path/to/rootCA.pem
@@ -82,9 +96,16 @@ sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keyc
 
 `/path/to/rootCA.pem`は、実際にコピーした`rootCA.pem`ファイルのパスに置き換えてください。
 
-4.  Chrome などのブラウザで、`https://yourdomain.local`にアクセスします。警告が表示されなくなるはずです。
+4.  `https://yourdomain.local`にアクセス
+
+Chrome などのブラウザで、`https://yourdomain.local`にアクセスします。 警告が表示されなくなるはずです。
+
+:::message
+起動済みのブラウザの場合、一度再起動しないと反映されません。  
+反映されない場合は、完全に終了してから再度開いてみてください。
+:::
 
 ## まとめ
 
-`mkcert` を使用すると、`.local` ドメインを使用したローカル開発の HTTPS 設定が簡素化されます。  
-これにより、安全な開発環境を作成し、Web アプリケーションをより快適に開発できます。
+`mkcert` を使用して、`.local` ドメインを使用したローカル開発の HTTPS 設定を簡単にできました。  
+用法用量を守って良い感じに使いましょう。
