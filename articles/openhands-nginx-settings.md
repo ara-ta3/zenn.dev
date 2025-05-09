@@ -100,13 +100,13 @@ sudo systemctl reload nginx
 アクセス元の `/etc/hosts` に Ubuntu の IP と openhands.yourdomain.local のマッピングがある前提です。
 :::
 
-ブラウザで `https://openhands.yourdomain.local` にアクセスして、openhands の UI が表示されることを確認します。
+ブラウザで `https://openhands.yourdomain.local` にアクセスして、OpenHands の UI が表示されることを確認します。
 LLM や Git の API キーや Token の設定をした後に会話のページにて、下の方に　`クライアントの準備を待機中` などのメッセージが出てくると思います。  
 ここが最終的に `エージェントがユーザ入力を待機中...` までいけば準備は完了です。  
-このメッセージが出ないが、nginx を経由せずにポート指定したアプリケーションでは動くなどの場合、websocket 周りの設定が上手く行っていないかもしれません。
+このメッセージが出ないが、nginx を経由せずにポート指定したアプリケーションでは動くなどの場合、WebSocket 周りの設定が上手く行っていないかもしれません。
 
-バージョンが変わり、 websocket のパス変更がもし起きている場合は、Developers Console などでリクエストを見たりするのが良いかもしれません。
-今回使っているバージョンの 0.36.0 では `wss://openhands.yourdomain.local/socket.io/` を Develops Console の Network 内で見つけたため、websocket の設定を nginx へと 追加しています。
+バージョンが変わり、 WebSocket のパス変更がもし起きている場合は、Developers Console などでリクエストを見たりするのが良いかもしれません。
+今回使っているバージョンの 0.36.0 では `wss://openhands.yourdomain.local/socket.io/` を Develops Console の Network 内で見つけたため、WebSocket の設定を nginx へと 追加しています。
 
 ## まとめ
 
