@@ -3,7 +3,7 @@ title: "Vikeを使ってVite+TypeScript+Reactの動的ルーティングのペ�
 emoji: "🐕"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["React", "TypeScript", "SSG", "Vite", "Vike"]
-published: false
+published: true
 ---
 
 ## はじめに
@@ -198,6 +198,8 @@ async function onBeforePrerenderStart() {
 }
 ```
 
+https://vike.dev/onBeforePrerenderStart
+
 ## ビルドする
 
 vike build を実行し、実際に html ファイルを出力します。  
@@ -238,5 +240,7 @@ dist/client/hoge/2/index.html
 
 vite+vike+vike-react を利用して、動的な ID を持つページの SSG が出来ました。
 割とサクッと出来たので vite+vike はやはり便利だなと感じます。
-一方で、まだ vike のメジャーバージョンが低いこともあり、カジュアルに警告が出たり、古い情報がすぐ使えなくなってしまうみたいなことが起きるので、気持ちを強く持って使う必要があるなと思います。
+一方で、vike はまだ発展途上の段階ということもあり、ちょっとしたアップデートで警告が出たり、古い情報が使えなくなる場面もあります。  
+そうした変化の激しさも含めて受け入れつつ、自分の手で動かして確かめながら、強い気持ちで向き合っていく必要があるなと思いました。
+
 この記事が、動的なページの SSG の足がかりになれば幸いです！
