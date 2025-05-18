@@ -2,7 +2,7 @@
 title: "Vikeを使ってVite+TypeScript+Reactの動的ルーティングのページにメタ情報を含めてSSGする"
 emoji: "🐕"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["React", "TypeScript", "SSG", "Vite", "Vike", "contest2025ts"]
+topics: ["React", "SSG", "Vite", "Vike", "contest2025ts"]
 published: true
 ---
 
@@ -244,3 +244,13 @@ vite+vike+vike-react を利用して、動的な ID を持つページの SSG �
 そうした変化の激しさも含めて受け入れつつ、自分の手で動かして確かめながら、強い気持ちで向き合っていく必要があるなと思いました。
 
 この記事が、動的なページの SSG の足がかりになれば幸いです！
+
+## 参考
+
+参考までに以下サイトで利用しています。  
+
+### Nekometry
+
+https://github.com/ara-ta3/Nekometry
+https://nekometry.web.app/
+

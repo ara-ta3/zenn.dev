@@ -307,3 +307,19 @@ tree -I node_modules -I dist
 ## (余談) GitHub Pages へのデプロイ
 
 GitHub Pages へは vite build 後に dist/client というディレクトリが生成されるので、その dist/client ディレクトリをホスティングするとうまく表示できます。
+
+## 参考
+
+参考までに以下サイトで利用しています。  
+
+### Nekometry
+
+https://github.com/ara-ta3/Nekometry
+https://nekometry.web.app/
+
+### 個人サイト
+
+https://github.com/ara-ta3/ara-ta3.github.io
+https://ara-ta3.github.io/
+
+
