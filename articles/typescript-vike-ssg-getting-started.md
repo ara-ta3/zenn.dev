@@ -320,6 +320,6 @@ https://nekometry.web.app/?utm_source=zenn.dev&utm_medium=referral&utm_campaign=
 ### 個人サイト
 
 https://github.com/ara-ta3/ara-ta3.github.io
-https://ara-ta3.github.io/?utm_source=zenn.dev&utm_medium=referral&utm_campaign=article20241228
+https://ara-ta3.github.io/
 
 
