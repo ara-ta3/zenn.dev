@@ -249,8 +249,5 @@ vite+vike+vike-react を利用して、動的な ID を持つページの SSG �
 
 参考までに以下サイトで利用しています。  
 
-### Nekometry
-
 https://github.com/ara-ta3/Nekometry
-https://nekometry.web.app/
-
+https://nekometry.web.app/?utm_source=zenn.dev&utm_medium=referral&utm_campaign=article20250513
