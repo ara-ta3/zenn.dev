@@ -2,8 +2,8 @@
 title: "スマホから家庭内ネットワークのOpenHandsにアクセス出来るようにしてスマホからAIエージェントに指示を出せるようにした"
 emoji: "👏"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["mkcert", "dnsmasq", "openhands"]
-published: false
+topics: ["mkcert", "dnsmasq", "openhands", "network"]
+published: true
 ---
 
 ## はじめに
