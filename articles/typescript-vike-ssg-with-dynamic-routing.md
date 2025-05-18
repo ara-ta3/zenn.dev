@@ -2,7 +2,7 @@
 title: "Vikeを使ってVite+TypeScript+Reactの動的ルーティングのページにメタ情報を含めてSSGする"
 emoji: "🐕"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["React", "TypeScript", "SSG", "Vite", "Vike"]
+topics: ["React", "TypeScript", "SSG", "Vite", "Vike", "contest2025ts"]
 published: true
 ---
 
