@@ -314,7 +314,6 @@ GitHub Pages へは vite build 後に dist/client というディレクトリが
 
 ### Nekometry
 
-https://github.com/ara-ta3/Nekometry
 https://nekometry.web.app/?utm_source=zenn.dev&utm_medium=referral&utm_campaign=article20241228
 
 ### 個人サイト
