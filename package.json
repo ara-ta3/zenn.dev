@@ -21,6 +21,6 @@
     "textlint": "14.7.2",
     "textlint-rule-preset-ja-technical-writing": "12.0.2",
     "textlint-rule-spellcheck-tech-word": "5.0.0",
-    "zenn-cli": "0.1.160"
+    "zenn-cli": "0.1.161"
   }
 }
