@@ -130,7 +130,7 @@ Claude Code Action では、初期設定ではセキュリティ上の理由か�
 `Bash(コマンド:*)` というような記述ですね。  
 このとき、package.json の scripts 以下にコマンドが定義されている場合は許可されていなくても実行できます。
 
-つまり、 `Bash(npm:*)` しかなかったとして、package.json の scripts 以下に `"test": "node sample.test.js"` の記述がある場合、 node の権限なしで npm の権限のみであっても`npm run test`経由で実行できます。
+つまり、 `Bash(npm:*)` しかなかったとして、package.json の scripts 以下に `"test": "node sample.test.js"` の記述がある場合、 node の権限なしで npm の権限のみでも`npm run test`経由で実行できます。
 
 ### サブコマンドも指定して許容するパターン
 
@@ -149,7 +149,5 @@ Claude Code Action では、初期設定ではセキュリティ上の理由か�
 
 ## まとめと感想
 
-- Bash(npm:\*)などによって claude が npm などのを実行できるような権限設定ができました
-  - これでテストなども回してくれて便利です
-- allowed_tools を指定して安全に楽しく @claude と開発をしましょう
-- Claude Code Action で遊ぶのは楽しいですが、API の従量課金だと無制限にお金が溶けていくのが困りどころさん
+`Bash(npm:*)`などによって claude が npm などのを実行できるような権限設定ができました。これでテストなども回してくれて便利になるはずです。  
+allowed_tools を指定して安全に楽しく @claude と開発を楽しんでいきましょう。(Claude Code Action で遊ぶのは楽しいですが、API の従量課金だと無制限にお金が溶けていくのが困りどころさん)
