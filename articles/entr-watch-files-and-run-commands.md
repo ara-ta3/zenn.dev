@@ -1,5 +1,5 @@
 ---
-title: "ファイルの変更を検知して任意のコマンドをパイプで渡して実行できるentrコマンドが便利"
+title: "entrコマンドでファイル変更をトリガーに処理を自動化する"
 emoji: "🔖"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["bash", "UNIX", "command", "cli"]
