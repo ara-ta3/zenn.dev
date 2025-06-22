@@ -13,7 +13,7 @@ published: true
 
 # entr コマンドとは
 
-`entr`は、ファイルの変更を監視して、変更があった際に指定したコマンドを実行する Unix ツールです。  
+`entr`は、ファイルの変更を監視して、変更があった際に指定したコマンドを実行する UNIX ツールです。  
 標準入力からファイルリストを受け取り、それらのファイルの変更があった際にコマンドを実行します。
 
 **公式サイト**
@@ -24,7 +24,7 @@ https://github.com/eradman/entr
 
 ## インストール
 
-Mac の場合は HomeBrew、Debian などであれば apt でも入るようです。
+Mac の場合は HomeBrew、Debian などでしたら apt でも入ります。
 
 ```bash
 # macOS (Homebrew)

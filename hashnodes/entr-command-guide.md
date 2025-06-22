@@ -13,7 +13,7 @@ In this article, I’ll introduce a useful tool for that purpose: the `entr` com
 
 # What is the `entr` Command?
 
-`entr` is a Unix utility that monitors file changes and executes a specified command when a change is detected.  
+`entr` is a UNIX utility that monitors file changes and executes a specified command when a change is detected.  
 It reads a list of files from standard input and executes the given command if any of those files are modified.
 
 **Official Site**  
