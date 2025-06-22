@@ -1,5 +1,5 @@
 ---
-title: "The `entr` Command: Convenient Tool for Executing Custom Commands via Pipe on File Change"
+title: "How to Use the entr Command to Automatically Run Scripts on File Change"
 emoji: "🔖"
 type: "tech"
 topics: ["command", "cli"]
