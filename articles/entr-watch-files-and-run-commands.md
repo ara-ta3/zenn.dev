@@ -3,7 +3,7 @@ title: "ファイルの変更を検知して任意のコマンドをパイプで
 emoji: "🔖"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["command", "cli"]
-published: false
+published: true
 ---
 
 # はじめに
