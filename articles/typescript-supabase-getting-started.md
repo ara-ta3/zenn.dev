@@ -3,7 +3,7 @@ title: "Supabaseをローカルで動かしてタスク一覧をvite+reactで表
 emoji: "🗂"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["supabase", "typescript", "react", "vite", "pnpm"]
-published: false
+published: true
 ---
 
 TypeScript + Vite + React で Supabase を使った簡単な TODO アプリを作ってみた時の備忘録です。  
