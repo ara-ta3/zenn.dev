@@ -1,5 +1,5 @@
 ---
-title: "Supabaseをローカルで動かしてタスク一覧をvite+reactで表示する"
+title: "Supabaseをローカルで動かしてタスクを表示するサンプルアプリをvite+reactで表示する"
 emoji: "🗂"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["supabase", "typescript", "react", "vite", "pnpm"]
