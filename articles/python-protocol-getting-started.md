@@ -14,9 +14,9 @@ Pythonには他の静的型付け言語のような明確な `interface` キー�
 
 本記事では、`dependency-injector` も組み合わせ、その具体的な実装方法をサンプルコードと共に備忘録として残します。
 
-# 設計の要となるProtocol
+# Protocolでインタフェースを定義する
 
-まずは、アプリケーションの疎結合性を高めるためのインターフェースを `Protocol` を使って定義します。
+まずは、アプリケーションの疎結合性を高めるためのインタフェースを `Protocol` を使って定義します。
 
 ## Protocolとは
 
@@ -28,9 +28,9 @@ Pythonの `Protocol` もこれと同じ考え方に基づいています。ク�
 
 これにより、具象クラスと、それを利用するコードとの間に疎結合な関係を築くことができ、柔軟でテストしやすい設計が可能になります。
 
-## Repositoryのインターフェースを定義する
+## Repositoryのインタフェースを定義する
 
-今回はデータアクセス層のインターフェースとして `UserRepositoryProtocol` を定義します。
+今回はデータアクセス層のインタフェースとして `UserRepositoryProtocol` を定義します。
 
 ```python
 from typing import Protocol, List, Optional
@@ -58,7 +58,7 @@ class UserRepositoryProtocol(Protocol):
 
 # 主要なコンポーネントの実装
 
-次に、定義した `Protocol` を利用して、アプリケーションの主要な部品である `Service` と `Repository` を実装します。
+次に、定義した `Protocol` を利用して、アプリケーションの主要な部品の `Service` と `Repository` を実装します。
 
 ## Serviceクラス
 
@@ -131,7 +131,7 @@ class UserRepositoryOnMemory:
 
 ## DIコンテナの定義
 
-`dependency-injector` を使って、どのインターフェース（`Protocol`）にどの具象クラスを注入するかを定義します。
+`dependency-injector` を使って、どのインタフェース（`Protocol`）にどの具象クラスを注入するかを定義します。
 
 `pip install dependency-injector` でインストールできます。
 
