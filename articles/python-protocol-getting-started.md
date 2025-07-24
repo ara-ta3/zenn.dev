@@ -8,8 +8,11 @@ published: false
 
 # 概要
 
-Python の Protocol と `dependency-injector` を活用した依存性注入（DI）パターンを試してみました。  
-Service クラスと Repository クラスの依存関係を Protocol で抽象化し、テスタビリティと保守性を向上させる方法についてサンプルコードと共に備忘録として残します。
+Pythonには他の静的型付け言語のような明確な `interface` キーワードがありませんが、それに代わる `Protocol` という概念を最近知りました。
+
+そこで、個人的に好んで使っている「ServiceクラスにRepositoryを注入する」というDI（依存性注入）パターンを、この `Protocol` を使ってPythonでどう実現できるか試してみることにしました。
+
+本記事では、`dependency-injector` も組み合わせ、その具体的な実装方法をサンプルコードと共に備忘録として残します。
 
 ## Protocolとは
 
@@ -80,9 +83,7 @@ class UserService:
 
 ## Repositoryの実装
 
-`UserRepositoryProtocol` を満たす具象クラスを実装します。ここでは、オンメモリでの実装と、データベースを利用する場合のスケルトン（骨格）を示します。
-
-### オンメモリ実装
+`UserRepositoryProtocol` を満たす具象クラスとして、オンメモリで動作する実装をします。
 
 ```python
 class UserRepositoryOnMemory:
@@ -108,27 +109,6 @@ class UserRepositoryOnMemory:
             del self._users[user_id]
             return True
         return False
-```
-
-### データベース実装（スケルトン）
-
-```python
-class UserRepositoryOnDatabase:
-    def find_by_id(self, user_id: int) -> Optional[User]:
-        # データベースからの検索処理
-        pass
-
-    def find_all(self) -> List[User]:
-        # データベースからの検索処理
-        pass
-
-    def save(self, user: User) -> User:
-        # データベースへの保存処理
-        pass
-
-    def delete(self, user_id: int) -> bool:
-        # データベースからの削除処理
-        pass
 ```
 
 ## DIコンテナの実装 (dependency-injector)
