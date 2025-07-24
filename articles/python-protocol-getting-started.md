@@ -1,7 +1,7 @@
 ---
 title: "PythonのProtocolを使ってDIを行う"
 emoji: "🐍"
-type: "tech" # tech: 技術記事 / idea: アイデア
+type: "tech"
 topics: ["python", "protocol", "di"]
 published: false
 ---
@@ -42,52 +42,6 @@ class UserRepositoryProtocol(Protocol):
         ...
 ```
 
-## Repository 実装クラス
-
-```python
-class InMemoryUserRepository:
-    def __init__(self):
-        self._users: dict[int, User] = {}
-        self._next_id = 1
-
-    def find_by_id(self, user_id: int) -> Optional[User]:
-        return self._users.get(user_id)
-
-    def find_all(self) -> List[User]:
-        return list(self._users.values())
-
-    def save(self, user: User) -> User:
-        if user.id == 0:
-            user.id = self._next_id
-            self._next_id += 1
-        self._users[user.id] = user
-        return user
-
-    def delete(self, user_id: int) -> bool:
-        if user_id in self._users:
-            del self._users[user_id]
-            return True
-        return False
-
-class DatabaseUserRepository:
-    # 実際のDB接続実装
-    def find_by_id(self, user_id: int) -> Optional[User]:
-        # DB検索ロジック
-        pass
-
-    def find_all(self) -> List[User]:
-        # DB検索ロジック
-        pass
-
-    def save(self, user: User) -> User:
-        # DB保存ロジック
-        pass
-
-    def delete(self, user_id: int) -> bool:
-        # DB削除ロジック
-        pass
-```
-
 ## Service クラスでの Protocol 活用
 
 ```python
@@ -121,6 +75,56 @@ class UserService:
         return self._user_repository.delete(user_id)
 ```
 
+## Repository の実装
+
+`UserRepositoryProtocol` を満たす具体的なクラスを実装します。  
+ここではインメモリでの実装と、データベースを利用する場合の骨格を示します。
+
+### インメモリ実装
+
+```python
+class UserRepositoryInMemory:
+    def __init__(self):
+        self._users: dict[int, User] = {}
+        self._next_id = 1
+
+    def find_by_id(self, user_id: int) -> Optional[User]:
+        return self._users.get(user_id)
+
+    def find_all(self) -> List[User]:
+        return list(self._users.values())
+
+    def save(self, user: User) -> User:
+        if user.id == 0:
+            user.id = self._next_id
+            self._next_id += 1
+        self._users[user.id] = user
+        return user
+
+    def delete(self, user_id: int) -> bool:
+        if user_id in self._users:
+            del self._users[user_id]
+            return True
+        return False
+```
+
+### データベース実装（スケルトン）
+
+```python
+class UserRepositoryOnDatabase:
+    def find_by_id(self, user_id: int) -> Optional[User]:
+        pass
+
+    def find_all(self) -> List[User]:
+        pass
+
+    def save(self, user: User) -> User:
+        pass
+
+    def delete(self, user_id: int) -> bool:
+        pass
+```
+
 ## DI コンテナの実装
 
 ```python
@@ -150,17 +154,14 @@ class DIContainer:
 
         raise ValueError(f"Service {service_type} is not registered")
 
-# DIコンテナのセットアップ
 def setup_container() -> DIContainer:
     container = DIContainer()
 
-    # Repositoryの登録
     container.register_instance(
         UserRepositoryProtocol,
-        InMemoryUserRepository()
+        UserRepositoryInMemory()
     )
 
-    # Serviceの登録
     container.register_factory(
         UserService,
         lambda: UserService(container.get(UserRepositoryProtocol))
@@ -173,13 +174,9 @@ def setup_container() -> DIContainer:
 
 ```python
 def main():
-    # DIコンテナの初期化
     container = setup_container()
-
-    # サービスの取得
     user_service = container.get(UserService)
 
-    # ビジネスロジックの実行
     user = user_service.create_user("田中太郎", "tanaka@example.com")
     print(f"作成されたユーザー: {user}")
 
@@ -201,32 +198,26 @@ from unittest.mock import Mock
 
 class TestUserService:
     def test_get_user_success(self):
-        # Arrange
         mock_repository = Mock(spec=UserRepositoryProtocol)
         expected_user = User(id=1, name="テストユーザー", email="test@example.com")
         mock_repository.find_by_id.return_value = expected_user
 
         user_service = UserService(mock_repository)
 
-        # Act
         result = user_service.get_user(1)
 
-        # Assert
         assert result == expected_user
         mock_repository.find_by_id.assert_called_once_with(1)
 
     def test_create_user(self):
-        # Arrange
         mock_repository = Mock(spec=UserRepositoryProtocol)
         created_user = User(id=1, name="新規ユーザー", email="new@example.com")
         mock_repository.save.return_value = created_user
 
         user_service = UserService(mock_repository)
 
-        # Act
         result = user_service.create_user("新規ユーザー", "new@example.com")
 
-        # Assert
         assert result == created_user
         mock_repository.save.assert_called_once()
 ```
