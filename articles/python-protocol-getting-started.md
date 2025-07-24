@@ -30,10 +30,10 @@ Pythonの `Protocol` もこれと同じ考え方に基づいています。ク�
 
 ## Repositoryのインタフェースを定義する
 
-今回はデータアクセス層のインタフェースとして `UserRepositoryProtocol` を定義します。
+今回はデータアクセス層のインタフェースとして、`UserRepositoryProtocol` を定義します。`put` メソッドは、型に応じて新規作成と更新をハンドリングする責務を持ちます。
 
 ```python
-from typing import Protocol, List, Optional
+from typing import Protocol, Optional, Union
 from dataclasses import dataclass
 
 @dataclass
@@ -42,17 +42,16 @@ class User:
     name: str
     email: str
 
+@dataclass
+class UserDetail:
+    name: str
+    email: str
+
 class UserRepositoryProtocol(Protocol):
-    def find_by_id(self, user_id: int) -> Optional[User]:
+    def fetch(self, user_id: int) -> Optional[User]:
         ...
 
-    def find_all(self) -> List[User]:
-        ...
-
-    def save(self, user: User) -> User:
-        ...
-
-    def delete(self, user_id: int) -> bool:
+    def put(self, data: Union[User, UserDetail]) -> User:
         ...
 ```
 
@@ -62,42 +61,29 @@ class UserRepositoryProtocol(Protocol):
 
 ## Serviceクラス
 
-`UserService` は、具体的な `Repository` の実装ではなく、先ほど定義した `UserRepositoryProtocol` に依存します。
+`UserService` は、`create_user` と `update_user` の責務を持ちます。Repositoryの `put` メソッドに適切な型を渡すことで、新規作成と更新を依頼します。
 
 ```python
 class UserService:
     def __init__(self, user_repository: UserRepositoryProtocol):
         self._user_repository = user_repository
 
-    def get_user(self, user_id: int) -> Optional[User]:
-        return self._user_repository.find_by_id(user_id)
+    def create_user(self, detail: UserDetail) -> User:
+        return self._user_repository.put(detail)
 
-    def create_user(self, name: str, email: str) -> User:
-        user = User(id=0, name=name, email=email)
-        return self._user_repository.save(user)
-
-    def get_all_users(self) -> List[User]:
-        return self._user_repository.find_all()
-
-    def update_user(self, user_id: int, name: str = None, email: str = None) -> Optional[User]:
-        user = self._user_repository.find_by_id(user_id)
+    def update_user(self, user_id: int, detail: UserDetail) -> Optional[User]:
+        user = self._user_repository.fetch(user_id)
         if not user:
             return None
 
-        if name is not None:
-            user.name = name
-        if email is not None:
-            user.email = email
-
-        return self._user_repository.save(user)
-
-    def delete_user(self, user_id: int) -> bool:
-        return self._user_repository.delete(user_id)
+        user.name = detail.name
+        user.email = detail.email
+        return self._user_repository.put(user)
 ```
 
 ## Repositoryクラス
 
-`UserRepositoryProtocol` を満たす具象クラスとして、オンメモリで動作する `UserRepositoryOnMemory` を実装します。
+`put` メソッドは、渡されたオブジェクトの型を `isinstance` で判定し、処理を分岐します。
 
 ```python
 class UserRepositoryOnMemory:
@@ -105,24 +91,20 @@ class UserRepositoryOnMemory:
         self._users: dict[int, User] = {}
         self._next_id = 1
 
-    def find_by_id(self, user_id: int) -> Optional[User]:
+    def fetch(self, user_id: int) -> Optional[User]:
         return self._users.get(user_id)
 
-    def find_all(self) -> List[User]:
-        return list(self._users.values())
-
-    def save(self, user: User) -> User:
-        if user.id == 0:
-            user.id = self._next_id
+    def put(self, data: Union[User, UserDetail]) -> User:
+        if isinstance(data, UserDetail):
+            new_user = User(id=self._next_id, name=data.name, email=data.email)
+            self._users[new_user.id] = new_user
             self._next_id += 1
-        self._users[user.id] = user
-        return user
-
-    def delete(self, user_id: int) -> bool:
-        if user_id in self._users:
-            del self._users[user_id]
-            return True
-        return False
+            return new_user
+        elif isinstance(data, User):
+            self._users[data.id] = data
+            return data
+        else:
+            raise TypeError("Unsupported type for put method")
 ```
 
 # DIによるアプリケーションの組み立て
@@ -160,17 +142,13 @@ def main():
     container = Container()
     user_service = container.user_service()
 
-    user = user_service.create_user("田中太郎", "tanaka@example.com")
-    print(f"作成されたユーザー: {user}")
+    created_user = user_service.create_user(UserDetail(name="田中太郎", email="tanaka@example.com"))
+    print(f"作成されたユーザー: {created_user}")
 
-    all_users = user_service.get_all_users()
-    print(f"全ユーザー: {all_users}")
-
-    updated_user = user_service.update_user(user.id, name="田中次郎")
+    updated_user = user_service.update_user(
+        created_user.id, UserDetail(name="田中次郎", email="jiro@example.com")
+    )
     print(f"更新されたユーザー: {updated_user}")
-
-if __name__ == "__main__":
-    main()
 ```
 
 # テスト容易性の確認
@@ -186,34 +164,44 @@ import pytest
 from unittest.mock import Mock
 
 class TestUserService:
-    def test_get_user_success(self):
-        mock_repository = Mock(spec=UserRepositoryProtocol)
-        expected_user = User(id=1, name="テストユーザー", email="test@example.com")
-        mock_repository.find_by_id.return_value = expected_user
-
-        user_service = UserService(mock_repository)
-
-        result = user_service.get_user(1)
-
-        assert result == expected_user
-        mock_repository.find_by_id.assert_called_once_with(1)
-
     def test_create_user(self):
         mock_repository = Mock(spec=UserRepositoryProtocol)
-        created_user = User(id=1, name="新規ユーザー", email="new@example.com")
-        mock_repository.save.return_value = created_user
+        detail = UserDetail(name="新規ユーザー", email="new@example.com")
+        saved_user = User(id=1, name=detail.name, email=detail.email)
+        mock_repository.put.return_value = saved_user
 
         user_service = UserService(mock_repository)
+        result = user_service.create_user(detail)
 
-        result = user_service.create_user("新規ユーザー", "new@example.com")
+        assert result == saved_user
+        mock_repository.put.assert_called_once_with(detail)
 
-        assert result == created_user
-        # 呼び出し時の引数を検証する
-        mock_repository.save.assert_called_once()
-        saved_user = mock_repository.save.call_args[0][0]
-        assert saved_user.name == "新規ユーザー"
-        assert saved_user.email == "new@example.com"
+    def test_update_user_success(self):
+        mock_repository = Mock(spec=UserRepositoryProtocol)
+        detail = UserDetail(name="新ユーザー", email="new@example.com")
+        existing_user = User(id=1, name="旧ユーザー", email="old@example.com")
+        mock_repository.fetch.return_value = existing_user
 
+        updated_user = User(id=1, name=detail.name, email=detail.email)
+        mock_repository.put.return_value = updated_user
+
+        user_service = UserService(mock_repository)
+        result = user_service.update_user(1, detail)
+
+        assert result == updated_user
+        mock_repository.fetch.assert_called_once_with(1)
+        mock_repository.put.assert_called_once_with(updated_user)
+
+    def test_update_user_not_found(self):
+        mock_repository = Mock(spec=UserRepositoryProtocol)
+        mock_repository.fetch.return_value = None
+
+        user_service = UserService(mock_repository)
+        result = user_service.update_user(99, UserDetail(name="誰か", email="darekasan@example.com"))
+
+        assert result is None
+        mock_repository.fetch.assert_called_once_with(99)
+        mock_repository.put.assert_not_called()
 ```
 
 # まとめ
