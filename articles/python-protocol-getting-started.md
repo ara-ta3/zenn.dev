@@ -1,14 +1,14 @@
 ---
-title: "PythonのProtocolを使ってDIを行う"
+title: "PythonのProtocolとdependency-injectorでDIする"
 emoji: "🐍"
 type: "tech"
-topics: ["python", "protocol", "di"]
+topics: ["python", "protocol", "di", "dependency-injector"]
 published: false
 ---
 
 # 概要
 
-Python の Protocol を活用した依存性注入（DI）パターンを試してみました。  
+Python の Protocol と `dependency-injector` を活用した依存性注入（DI）パターンを試してみました。  
 Service クラスと Repository クラスの依存関係を Protocol で抽象化し、テスタビリティと保守性を向上させる方法についてサンプルコードと共に備忘録として残します。
 
 ## Protocol とは
@@ -78,12 +78,12 @@ class UserService:
 ## Repository の実装
 
 `UserRepositoryProtocol` を満たす具体的なクラスを実装します。  
-ここではインメモリでの実装と、データベースを利用する場合の骨格を示します。
+ここではオンメモリでの実装と、データベースを利用する場合の骨格を示します。
 
-### インメモリ実装
+### オンメモリ実装
 
 ```python
-class UserRepositoryInMemory:
+class UserRepositoryOnMemory:
     def __init__(self):
         self._users: dict[int, User] = {}
         self._next_id = 1
@@ -125,57 +125,33 @@ class UserRepositoryOnDatabase:
         pass
 ```
 
-## DI コンテナの実装
+## DI コンテナの実装 (dependency-injector)
+
+DIには専用のライブラリ `dependency-injector` を利用します。  
+`pip install dependency-injector` でインストールできます。
 
 ```python
-from typing import TypeVar, Type, Dict, Any, Callable
+from dependency_injector import containers, providers
 
-T = TypeVar('T')
+class Container(containers.DeclarativeContainer):
+    config = providers.Configuration()
 
-class DIContainer:
-    def __init__(self):
-        self._services: Dict[Type[Any], Any] = {}
-        self._factories: Dict[Type[Any], Callable[[], Any]] = {}
-
-    def register_instance(self, service_type: Type[T], instance: T) -> None:
-        self._services[service_type] = instance
-
-    def register_factory(self, service_type: Type[T], factory: Callable[[], T]) -> None:
-        self._factories[service_type] = factory
-
-    def get(self, service_type: Type[T]) -> T:
-        if service_type in self._services:
-            return self._services[service_type]
-
-        if service_type in self._factories:
-            instance = self._factories[service_type]()
-            self._services[service_type] = instance
-            return instance
-
-        raise ValueError(f"Service {service_type} is not registered")
-
-def setup_container() -> DIContainer:
-    container = DIContainer()
-
-    container.register_instance(
-        UserRepositoryProtocol,
-        UserRepositoryInMemory()
+    user_repository = providers.Singleton(
+        UserRepositoryOnMemory
     )
 
-    container.register_factory(
+    user_service = providers.Factory(
         UserService,
-        lambda: UserService(container.get(UserRepositoryProtocol))
+        user_repository=user_repository,
     )
-
-    return container
 ```
 
 ## main での DI 実装
 
 ```python
 def main():
-    container = setup_container()
-    user_service = container.get(UserService)
+    container = Container()
+    user_service = container.user_service()
 
     user = user_service.create_user("田中太郎", "tanaka@example.com")
     print(f"作成されたユーザー: {user}")
@@ -191,6 +167,8 @@ if __name__ == "__main__":
 ```
 
 ## テストでの活用
+
+テストコードはDIライブラリの変更による影響を受けません。Protocolに依存しているため、引き続き `Mock` を利用してテストできます。
 
 ```python
 import pytest
@@ -219,15 +197,20 @@ class TestUserService:
         result = user_service.create_user("新規ユーザー", "new@example.com")
 
         assert result == created_user
+        # 呼び出し時の引数を検証する
         mock_repository.save.assert_called_once()
+        saved_user = mock_repository.save.call_args[0][0]
+        assert saved_user.name == "新規ユーザー"
+        assert saved_user.email == "new@example.com"
+
 ```
 
 # まとめ
 
-Python の Protocol と DI パターンを試してみました。
+Python の Protocol と `dependency-injector` を使った DI パターンを試してみました。
 
-- 型安全性とテスタビリティの向上
-- 実装の切り替えが容易になる柔軟性
-- インターフェースが明確になることによる保守性の向上
+- **型安全性とテスタビリティの向上**: Protocolにより、インターフェースが明確になり、安全なモックが可能になります。
+- **実装の切り替えが容易になる柔軟性**: `dependency-injector` を使うことで、設定ファイルなどに応じて使用する実装を簡単に切り替えられます。
+- **コードの簡潔化**: 自作のDIコンテナと比べて、`dependency-injector` はより宣言的でコードがシンプルになります。
 
-Protocol を使うことで、Python でも他言語同様に堅牢で保守性の高いアプリケーションを構築できそうです。
+Protocol と DI ライブラリを組み合わせることで、Python でも堅牢で保守性の高いアプリケーションを効率的に構築できそうです。
