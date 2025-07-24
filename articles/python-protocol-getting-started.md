@@ -2,7 +2,7 @@
 title: "PythonのProtocolとdependency-injectorでDIする"
 emoji: "🐍"
 type: "tech"
-topics: ["python", "protocol", "di", "dependency-injector"]
+topics: ["python", "protocol", "di", "dependencyinjector"]
 published: false
 ---
 
