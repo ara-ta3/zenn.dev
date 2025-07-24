@@ -11,12 +11,13 @@ published: false
 Python の Protocol と `dependency-injector` を活用した依存性注入（DI）パターンを試してみました。  
 Service クラスと Repository クラスの依存関係を Protocol で抽象化し、テスタビリティと保守性を向上させる方法についてサンプルコードと共に備忘録として残します。
 
-## Protocol とは
+## Protocolとは
 
-Python の Protocol は、構造的部分型（structural subtyping）を提供する仕組みです。  
-型システムレベルでインターフェースを定義でき、実装クラスが明示的に継承しなくても、必要なメソッドを持っていれば型として認識されます。
+Pythonの `Protocol` は、構造的部分型（structural subtyping）を導入するための機能です。これにより、クラスが特定のインタフェースを明示的に継承していなくても、必要なメソッドや属性を持ってさえいれば、そのインタフェースを満たすと見なされます。これによって、より柔軟な型付けが可能になります。
 
-## RepositoryProtocol の定義
+## RepositoryProtocolの定義
+
+まずは、データアクセス層のインタフェースを `Protocol` を使って定義します。
 
 ```python
 from typing import Protocol, List, Optional
@@ -42,7 +43,9 @@ class UserRepositoryProtocol(Protocol):
         ...
 ```
 
-## Service クラスでの Protocol 活用
+## ServiceクラスでのProtocol活用
+
+次に、`UserService` が具象クラスではなく `UserRepositoryProtocol` に依存するように実装します。これにより、`UserService` はデータアクセスの具体的な実装から切り離されます。
 
 ```python
 class UserService:
@@ -75,10 +78,9 @@ class UserService:
         return self._user_repository.delete(user_id)
 ```
 
-## Repository の実装
+## Repositoryの実装
 
-`UserRepositoryProtocol` を満たす具体的なクラスを実装します。  
-ここではオンメモリでの実装と、データベースを利用する場合の骨格を示します。
+`UserRepositoryProtocol` を満たす具象クラスを実装します。ここでは、オンメモリでの実装と、データベースを利用する場合のスケルトン（骨格）を示します。
 
 ### オンメモリ実装
 
@@ -113,21 +115,26 @@ class UserRepositoryOnMemory:
 ```python
 class UserRepositoryOnDatabase:
     def find_by_id(self, user_id: int) -> Optional[User]:
+        # データベースからの検索処理
         pass
 
     def find_all(self) -> List[User]:
+        # データベースからの検索処理
         pass
 
     def save(self, user: User) -> User:
+        # データベースへの保存処理
         pass
 
     def delete(self, user_id: int) -> bool:
+        # データベースからの削除処理
         pass
 ```
 
-## DI コンテナの実装 (dependency-injector)
+## DIコンテナの実装 (dependency-injector)
 
-DIには専用のライブラリ `dependency-injector` を利用します。  
+依存性の注入には、専用ライブラリ `dependency-injector` を利用します。これにより、依存関係の管理がより宣言的かつシンプルになります。
+
 `pip install dependency-injector` でインストールできます。
 
 ```python
@@ -146,7 +153,9 @@ class Container(containers.DeclarativeContainer):
     )
 ```
 
-## main での DI 実装
+## mainでのDI実装
+
+アプリケーションの起動時にコンテナを初期化し、必要なサービスを取得します。
 
 ```python
 def main():
@@ -168,7 +177,7 @@ if __name__ == "__main__":
 
 ## テストでの活用
 
-テストコードはDIライブラリの変更による影響を受けません。Protocolに依存しているため、引き続き `Mock` を利用してテストできます。
+`Protocol` に依存しているため、DIライブラリの変更はテストコードに影響を与えません。引き続き `unittest.mock.Mock` を使って、Repositoryの振る舞いを模倣したテストが可能です。
 
 ```python
 import pytest
@@ -209,8 +218,8 @@ class TestUserService:
 
 Python の Protocol と `dependency-injector` を使った DI パターンを試してみました。
 
-- **型安全性とテスタビリティの向上**: Protocolにより、インターフェースが明確になり、安全なモックが可能になります。
-- **実装の切り替えが容易になる柔軟性**: `dependency-injector` を使うことで、設定ファイルなどに応じて使用する実装を簡単に切り替えられます。
-- **コードの簡潔化**: 自作のDIコンテナと比べて、`dependency-injector` はより宣言的でコードがシンプルになります。
+- **型安全性とテスタビリティの向上**: Protocolにより、インタフェースが明確になり、安全なモックが可能になる。
+- **実装の切り替えが容易になる柔軟性**: `dependency-injector` を使うことで、設定ファイルなどに応じて使用する実装を簡単に切り替えられる。
+- **コードの簡潔化**: 自作のDIコンテナと比べて、`dependency-injector` はより宣言的でコードがシンプルになる。
 
 Protocol と DI ライブラリを組み合わせることで、Python でも堅牢で保守性の高いアプリケーションを効率的に構築できそうです。
