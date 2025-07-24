@@ -14,6 +14,10 @@ Pythonには他の静的型付け言語のような明確な `interface` キー�
 
 本記事では、`dependency-injector` も組み合わせ、その具体的な実装方法をサンプルコードと共に備忘録として残します。
 
+# 設計の要となるProtocol
+
+まずは、アプリケーションの疎結合性を高めるためのインターフェースを `Protocol` を使って定義します。
+
 ## Protocolとは
 
 Pythonの `Protocol` は、Go言語の `interface` に非常によく似た概念です。
@@ -24,9 +28,9 @@ Pythonの `Protocol` もこれと同じ考え方に基づいています。ク�
 
 これにより、具象クラスと、それを利用するコードとの間に疎結合な関係を築くことができ、柔軟でテストしやすい設計が可能になります。
 
-## RepositoryProtocolの定義
+## Repositoryのインターフェースを定義する
 
-まずは、データアクセス層のインタフェースを `Protocol` を使って定義します。
+今回はデータアクセス層のインターフェースとして `UserRepositoryProtocol` を定義します。
 
 ```python
 from typing import Protocol, List, Optional
@@ -52,9 +56,13 @@ class UserRepositoryProtocol(Protocol):
         ...
 ```
 
-## ServiceクラスでのProtocol活用
+# 主要なコンポーネントの実装
 
-次に、`UserService` が具象クラスではなく `UserRepositoryProtocol` に依存するように実装します。これにより、`UserService` はデータアクセスの具体的な実装から切り離されます。
+次に、定義した `Protocol` を利用して、アプリケーションの主要な部品である `Service` と `Repository` を実装します。
+
+## Serviceクラス
+
+`UserService` は、具体的な `Repository` の実装ではなく、先ほど定義した `UserRepositoryProtocol` に依存します。
 
 ```python
 class UserService:
@@ -87,9 +95,9 @@ class UserService:
         return self._user_repository.delete(user_id)
 ```
 
-## Repositoryの実装
+## Repositoryクラス
 
-`UserRepositoryProtocol` を満たす具象クラスとして、オンメモリで動作する実装をします。
+`UserRepositoryProtocol` を満たす具象クラスとして、オンメモリで動作する `UserRepositoryOnMemory` を実装します。
 
 ```python
 class UserRepositoryOnMemory:
@@ -117,9 +125,13 @@ class UserRepositoryOnMemory:
         return False
 ```
 
-## DIコンテナの実装 (dependency-injector)
+# DIによるアプリケーションの組み立て
 
-依存性の注入には、専用ライブラリ `dependency-injector` を利用します。これにより、依存関係の管理がより宣言的かつシンプルになります。
+実装したコンポーネントを `dependency-injector` を使って結合し、アプリケーションとして実行できるようにします。
+
+## DIコンテナの定義
+
+`dependency-injector` を使って、どのインターフェース（`Protocol`）にどの具象クラスを注入するかを定義します。
 
 `pip install dependency-injector` でインストールできます。
 
@@ -139,9 +151,9 @@ class Container(containers.DeclarativeContainer):
     )
 ```
 
-## mainでのDI実装
+## アプリケーションの実行
 
-アプリケーションの起動時にコンテナを初期化し、必要なサービスを取得します。
+コンテナから `UserService` のインスタンスを取得して、ビジネスロジックを実行します。
 
 ```python
 def main():
@@ -161,9 +173,13 @@ if __name__ == "__main__":
     main()
 ```
 
-## テストでの活用
+# テスト容易性の確認
 
-`Protocol` に依存しているため、DIライブラリの変更はテストコードに影響を与えません。引き続き `unittest.mock.Mock` を使って、Repositoryの振る舞いを模倣したテストが可能です。
+`Protocol` を使うことで、テストが非常に書きやすくなります。`Service` のテストをする際に、本物の `Repository` の代わりにモックオブジェクトを注入できるためです。
+
+## Protocolを使ったユニットテスト
+
+`unittest.mock.Mock` を使って `UserRepositoryProtocol` の振る舞いを模倣し、`UserService` をテストします。
 
 ```python
 import pytest
