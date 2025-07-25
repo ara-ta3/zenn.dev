@@ -3,7 +3,7 @@ title: "PythonのProtocolとdependency-injectorでDIする"
 emoji: "🐍"
 type: "tech"
 topics: ["python", "protocol", "di", "dependencyinjector"]
-published: false
+published: true
 ---
 
 # 概要
@@ -331,7 +331,7 @@ class TestUserServiceWithFixture:
 uv run pytest main2.py
 ======================================================== test session starts ========================================================
 platform darwin -- Python 3.13.3, pytest-8.4.1, pluggy-1.6.0
-rootdir: /Users/arata/Documents/zenn/python/protocol
+rootdir: /path/to/pythonprotocol
 collected 3 items
 
 main2.py ...                                                                                                                  [100%]
