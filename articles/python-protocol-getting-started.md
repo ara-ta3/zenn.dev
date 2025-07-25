@@ -169,7 +169,7 @@ uv pip install pytest dependency_injector
 uv run python main.py
 ```
 
-実行すると、ユーザーが作成・更新されたことがわかります。
+実行すると、ユーザー作成、更新が成功していることがわかります。
 
 ```text
 作成されたユーザー: User(id=1, detail=UserDetail(name='田中太郎', email='tanaka@example.com'))
