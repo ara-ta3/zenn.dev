@@ -12,7 +12,7 @@ Pythonには他の静的型付け言語のような明確な `interface` キー�
 
 そこで、個人的に好んで使っている「ServiceクラスにRepositoryを注入する」というDI（依存性注入）パターンを、この `Protocol` を使ってPythonでどう実現できるか試してみることにしました。
 
-本記事では、`dependency-injector` も組み合わせ、その具体的な実装方法をサンプルコードと共に備忘録として残します。
+この記事では、`dependency-injector` も組み合わせ、その具体的な実装方法をサンプルコードと共に備忘録として残します。
 
 # Protocolでインタフェースを定義する
 
@@ -37,15 +37,15 @@ from typing import Protocol, Optional, Union
 from dataclasses import dataclass
 
 @dataclass
-class User:
-    id: int
-    name: str
-    email: str
-
-@dataclass
 class UserDetail:
     name: str
     email: str
+
+
+@dataclass
+class User:
+    id: int
+    detail: UserDetail
 
 class UserRepositoryProtocol(Protocol):
     def fetch(self, user_id: int) -> Optional[User]:
@@ -76,8 +76,8 @@ class UserService:
         if not user:
             return None
 
-        user.name = detail.name
-        user.email = detail.email
+        user.detail.name = detail.name
+        user.detail.email = detail.email
         return self._user_repository.put(user)
 ```
 
@@ -96,7 +96,7 @@ class UserRepositoryOnMemory:
 
     def put(self, data: Union[User, UserDetail]) -> User:
         if isinstance(data, UserDetail):
-            new_user = User(id=self._next_id, name=data.name, email=data.email)
+            new_user = User(id=self._next_id, detail=data)
             self._users[new_user.id] = new_user
             self._next_id += 1
             return new_user
@@ -167,7 +167,7 @@ class TestUserService:
     def test_create_user(self):
         mock_repository = Mock(spec=UserRepositoryProtocol)
         detail = UserDetail(name="新規ユーザー", email="new@example.com")
-        saved_user = User(id=1, name=detail.name, email=detail.email)
+        saved_user = User(id=1, detail=detail)
         mock_repository.put.return_value = saved_user
 
         user_service = UserService(mock_repository)
@@ -179,10 +179,10 @@ class TestUserService:
     def test_update_user_success(self):
         mock_repository = Mock(spec=UserRepositoryProtocol)
         detail = UserDetail(name="新ユーザー", email="new@example.com")
-        existing_user = User(id=1, name="旧ユーザー", email="old@example.com")
+        existing_user = User(id=1, detail=UserDetail(name="旧ユーザー", email="old@example.com"))
         mock_repository.fetch.return_value = existing_user
 
-        updated_user = User(id=1, name=detail.name, email=detail.email)
+        updated_user = User(id=1, detail=detail)
         mock_repository.put.return_value = updated_user
 
         user_service = UserService(mock_repository)
