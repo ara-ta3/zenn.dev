@@ -3,7 +3,7 @@ title: "MySQLで中央値を取得するSQLを書く"
 emoji: "📑"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["mysql", "統計", "中央値"]
-published: false
+published: true
 ---
 
 # はじめに
