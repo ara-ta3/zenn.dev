@@ -1,31 +1,28 @@
-
 ---
-title: "MySQL 8で『グループごとに最新1件だけ』を取得する：ROW_NUMBERでシンプルに書く"
+title: "MySQLで『グループごとに最新1件だけ』を取得する"
 emoji: "📊"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["mysql", "sql", "database", "tips"]
 published: false
 ---
 
-SQLを書いていると、  
-「**何かしらのIDでグループ化して、その中で最新の1件だけ欲しい**」  
-という場面、よくありませんか？
+## はじめに
 
-たとえば──
+MySQLでSQLを書いていて「**何かしらでグループ化して、その中で最新の1件だけ欲しい**」みたいなパターンに何度か直面しました。  
+具体的に浮かぶユースケースとしては
 
 - 各ユーザーの**最新ログイン履歴**  
 - 各注文の**最新ステータス**  
 - 各記事の**最新編集内容**
 
-など、ユースケースはいろいろですが、  
-やりたいことは共通していて「**グループごとに最新1件を取る**」ことです。
+などのイメージですが、  
+やりたいことは共通していて「**グループごとに最新1件を取る**」ことでした。  
+なので今回はこのとき書くSQLを備忘録がてら書いておこうというのが趣旨です。  
 
----
-
-## 💡 想定する例：記事の更新履歴テーブル
+## 準備: 記事の更新履歴テーブル
 
 今回は例として、ブログ記事の更新履歴テーブルを題材にします。  
-やりたいことは「**記事ごとに最新の編集履歴だけを取得したい**」。
+やりたいことは「**記事ごとに最新の編集履歴だけを取得したい**」です。  
 
 ```sql
 CREATE TABLE article_histories (
@@ -33,8 +30,7 @@ CREATE TABLE article_histories (
   article_id INT NOT NULL,             -- 記事を識別するID
   version INT NOT NULL,                -- バージョン番号
   content TEXT,                        -- 記事内容
-  updated_at DATETIME(6) NOT NULL,     -- 更新日時
-  KEY idx_article_updated (article_id, updated_at DESC)
+  updated_at DATETIME(6) NOT NULL      -- 更新日時
 );
 ```
 
@@ -49,9 +45,8 @@ INSERT INTO article_histories (article_id, version, content, updated_at) VALUES
 (3, 1, '初回投稿', '2025-10-02 10:00:00.000000');
 ```
 
----
 
-## 🧮 方法1：`ROW_NUMBER()`で最新1件を取る（MySQL 8以降）
+## 方法1: `ROW_NUMBER()`で最新1件を取る（MySQL 8以降）
 
 MySQL 8 以降では、**ウィンドウ関数**を使えば一発です。
 
@@ -74,9 +69,7 @@ ORDER BY article_id;
 
 タイブレーク用に `id DESC` を追加しておくと、同時刻更新があっても安定します。
 
----
-
-## 🔁 方法2：`MAX()` と `JOIN` で書く（古典的なやり方）
+## 方法2: `MAX()` と `JOIN` で書く（一般的なSQLでのやり方）
 
 MySQL 5系などウィンドウ関数が使えない環境では、  
 `MAX()` サブクエリと `JOIN` を組み合わせます。
@@ -95,19 +88,6 @@ JOIN (
 
 この方法でも同様に「各 `article_id` の最新1件」を取得できます。  
 ただし、**同時刻に複数レコードがあると重複**して返るので注意。
-
----
-
-## ⚙️ パフォーマンスのためのインデックス
-
-今回のように「グループ化＋最新順ソート」をする場合は  
-次のような複合インデックスが効きます。
-
-```sql
-CREATE INDEX idx_article_updated ON article_histories (article_id, updated_at DESC);
-```
-
----
 
 ## 📘 まとめ
 
