@@ -1,14 +1,17 @@
-NPX=npx
+PNPM=pnpm
+
+install:
+	$(PNPM) install
 
 preview:
-	$(NPX) zenn preview
+	$(PNPM) exec zenn preview
 
 new:
-	$(NPX) zenn new:article
+	$(PNPM) exec zenn new:article
 
 lint:
-	$(NPX) textlint --config ./textlintrc.json --ignore-path ./textlintignore articles
+	$(PNPM) exec textlint --config ./textlintrc.json --ignore-path ./textlintignore articles
 
 lint/fix:
-	$(NPX) textlint --config ./textlintrc.json --ignore-path ./textlintignore --fix articles
+	$(PNPM) exec textlint --config ./textlintrc.json --ignore-path ./textlintignore --fix articles
 
