@@ -6,8 +6,18 @@ topics: ["Scala", "JMH", "Benchmark"]
 published: false
 ---
 
+# はじめに
+
 Scala で定番のマイクロベンチマークツール JMH を試したときのメモです。  
-`sbt-jmh` を使うと sbt からそのまま実行でき、Java/Scala どちらのコードも計測できます。
+`sbt-jmh` を使うと sbt からベンチマークを測るコマンドが使えるので便利でした。
+
+https://github.com/openjdk/jmh
+
+https://github.com/sbt/sbt-jmh
+
+今回利用したコードは以下の Repository に置いてあります。
+
+https://github.com/ara-ta3/scala-jmh-getting-started
 
 # 1. sbt-jmh の準備
 
@@ -15,11 +25,10 @@ Scala で定番のマイクロベンチマークツール JMH を試したとき
 
 ```scala
 // project/plugins.sbt
-addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.6")
+addSbtPlugin("pl.project13.scala" % "sbt-jmh" % "0.4.8")
 ```
 
-`build.sbt` はこんな感じにしました。`enablePlugins(JmhPlugin)` を付けるだけで JMH 用の設定が入ります。  
-計測時に JVM を分けたい場合は `Jmh / fork := true` を入れておくと安心です。
+`build.sbt` は以下のようにしました。`enablePlugins(JmhPlugin)` を付けるだけで JMH 用の設定が入ります。
 
 ```scala
 // build.sbt
@@ -36,15 +45,11 @@ lazy val root = (project in file("."))
   )
 ```
 
-`Test / fork := true` は、テスト（および test タスクにぶら下がるプラグイン動作）を sbt 本体とは別 JVM で実行する設定です。テスト実行時のクラスパス汚染や JVM オプションの影響が sbt セッションに漏れないので、特にベンチマークのように GC 設定やヒープサイズを変えたいときに安全です。
+`Test / fork := true` は、テスト（および test タスクにぶら下がるプラグイン動作）を sbt 本体とは別 JVM で実行する設定です。テスト実行時のクラスパス汚染や JVM オプションの影響が sbt セッションに漏れないので、特にベンチマークのように GC 設定やヒープサイズを変えたいときに便利という理解でいます。
+今回はソースコードとは別に bench というディレクトリを作成し、そこにベンチマークのコードを書くことにしました。  
+そのため、 `Jmh / unmanagedSourceDirectories += baseDirectory.value / "src" / "bench" / "scala"` という記述を追加しています。
 
-手元で有効になっているか確かめる簡単な方法:
-
-- `sbt "show Test / fork"` で true/false を見る
-- `sbt -debug "Test / test"` を流すと、`Forking tests - java ...` のログが出る（false の場合はそのログが出ない）
-- さらに PID を確認したい場合は、一時的に `Test / javaOptions += "-Dshow.pid=true"` を入れ、テストコード側で `println(java.lang.management.ManagementFactory.getRuntimeMXBean.getName)` を出力すると、sbt 本体とは別 PID で動いているのが分かる
-
-# 2. ベンチマークを書く
+# 2. 実装サンプルコードとベンチマーク計測用の記述を書く
 
 プロダクション側はベンチマーク非依存にして、JMH のアノテーションはベンチマーク用クラスだけに閉じ込めます。  
 フィボナッチを素直に再帰で計算する `SimpleFibonacci`（implementation1）、末尾再帰でスタックを使わない `TailrecFibonacci`（implementation2）、キャッシュで計算済みを再利用する `CachedFibonacci`（implementation3）の 3 パターンを用意しました。
@@ -125,13 +130,13 @@ class FibonacciBenchmark {
 `jmh:run` でベンチマークを実行できます。フィルタを付けると対象を絞れます。
 
 ```bash
-sbt "jmh:run -i 5 -wi 3 -f1 -t1 .*FibonacciBenchmark.*"
+sbt "jmh:run -i 3 -wi 1 -f1 -t1 .*FibonacciBenchmark.*"
 ```
 
-- `-i 5`: 本計測のイテレーション数  
-- `-wi 3`: ウォームアップ回数  
-- `-f1`: fork の回数  
-- `-t1`: スレッド数  
+- `-i 3`: 本計測のイテレーション数
+- `-wi 1`: ウォームアップ回数
+- `-f1`: fork の回数
+- `-t1`: スレッド数
 
 手元ではこんな結果になりました（数字は環境によります）。
 
