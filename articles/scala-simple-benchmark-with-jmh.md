@@ -132,7 +132,7 @@ sbt "jmh:run -i 5 -wi 3 -f1 -t1 .*FibonacciBenchmark.*"
 [info]   10454.558 ±(99.9%) 184.786 ns/op [Average]
 [info]   (min, avg, max) = (10411.597, 10454.558, 10536.046), stdev = 47.988
 [info]   CI (99.9%): [10269.772, 10639.345] (assumes normal distribution)
-
+...
 [info] # Warmup Iteration   1: 1.450 ns/op
 [info] # Warmup Iteration   2: 2.345 ns/op
 [info] # Warmup Iteration   3: 2.034 ns/op
@@ -145,6 +145,14 @@ sbt "jmh:run -i 5 -wi 3 -f1 -t1 .*FibonacciBenchmark.*"
 [info]   2.000 ±(99.9%) 0.123 ns/op [Average]
 [info]   (min, avg, max) = (1.969, 2.000, 2.046), stdev = 0.032
 [info]   CI (99.9%): [1.877, 2.123] (assumes normal distribution)
+...
+[info] Benchmark                  (n)  Mode  Cnt         Score         Error  Units
+[info] FibonacciBenchmark.after    20  avgt    5         1.915 ±       0.056  ns/op
+[info] FibonacciBenchmark.after    30  avgt    5         2.000 ±       0.123  ns/op
+[info] FibonacciBenchmark.after    35  avgt    5         1.970 ±       0.054  ns/op
+[info] FibonacciBenchmark.before   20  avgt    5     10454.558 ±     184.786  ns/op
+[info] FibonacciBenchmark.before   30  avgt    5   1327375.264 ±   22665.800  ns/op
+[info] FibonacciBenchmark.before   35  avgt    5  14599165.277 ± 1375393.712  ns/op
 ```
 
 `before`（キャッシュなし）は指数的に時間が伸び、`after`（キャッシュあり）は線形時間になり、大きな差が出ているのがわかります。
