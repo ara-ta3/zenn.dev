@@ -54,8 +54,9 @@ lazy val root = (project in file("."))
   )
 ```
 
-`Test / fork := true` は、テスト（および test タスクにぶら下がるプラグイン動作）を sbt 本体とは別 JVM で実行する設定です。テスト実行時のクラスパス汚染や JVM オプションの影響が sbt セッションに漏れないので、特にベンチマークのように GC 設定やヒープサイズを変えたいときに便利という理解でいます。
-なお、JMH はベンチマーク実行時に独自に fork（別 JVM 起動）を行うため、`Test / fork := true` は必須ではありません。
+`Test / fork := true` は、テスト（および test タスクにぶら下がるプラグイン動作）を sbt 本体とは別 JVM で実行する設定です。
+テスト実行時のクラスパス汚染や JVM オプションの影響が sbt セッションに漏れないので、特にベンチマークのように GC 設定やヒープサイズを変えたいときに便利という理解でいます。
+なお、JMH はベンチマーク実行時に独自に fork（別 JVM 起動）を行うためのものです。したがって、`Test / fork := true` はなくても問題ありません。
 今回はテストタスクと sbt 本体の JVM を分離する目的で付けています。
 
 今回はプロダクションコードと完全に分離するため、src/bench/scala に JMH 専用コードを配置する構成にしました。
@@ -64,7 +65,11 @@ sbt-jmh は src/jmh のようなデフォルトディレクトリを持たない
 # 2. 実装サンプルコードとベンチマーク計測用の記述を書く
 
 プロダクション側はベンチマーク非依存にして、JMH のアノテーションはベンチマーク用クラスだけに閉じ込めます。  
-フィボナッチを素直に再帰で計算する `SimpleFibonacci`（implementation1）、末尾再帰でスタックを使わない `TailrecFibonacci`（implementation2）、キャッシュで計算済みを再利用する `CachedFibonacci`（implementation3）の 3 パターンを用意しました。
+以下の 3 パターンを用意しました。
+
+- フィボナッチを素直に再帰で計算する `SimpleFibonacci`（implementation1）
+- 末尾再帰でスタックを使わない `TailrecFibonacci`（implementation2）
+- キャッシュで計算済みを再利用する `CachedFibonacci`（implementation3）
 
 ```scala
 // src/main/scala/example/Fibonacci.scala
@@ -171,7 +176,11 @@ sbt "Jmh/run -i 3 -wi 1 -f 1 -t 1 .*FibonacciBenchmark.*"
 [info] FibonacciBenchmark.implementation3   35  avgt    3         2.012 ±       0.505  ns/op
 ```
 
-`implementation1`（素朴再帰）は指数的に時間が伸びて厳しく、`implementation2`（末尾再帰）は線形で数ナノ秒程度に収まり、`implementation3`（キャッシュあり）はほぼ同水準かわずかに速い、という差が見えます（今回は各イテレーションでキャッシュを作り直しているため、キャッシュの恩恵は小さめ）。
+- `implementation1`（素朴再帰）は指数的に時間が伸びて厳しく
+- `implementation2`（末尾再帰）は線形で数ナノ秒程度に収まり
+- `implementation3`（キャッシュあり）はほぼ同水準かわずかに速い
+
+という差が見えます（今回は各イテレーションでキャッシュを作り直しているため、キャッシュの恩恵は小さめ）。
 
 # 4. まとめ
 
