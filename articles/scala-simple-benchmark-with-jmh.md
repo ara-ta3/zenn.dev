@@ -1,10 +1,15 @@
 ---
-title: "ScalaでJMHを使ってシンプルにベンチマークを取る"
+title: "Scala 3 + JMH を最短でセットアップする ~ sbt-jmh の最小構成 ~"
 emoji: "⏱️"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Scala", "JMH", "Benchmark"]
 published: false
 ---
+
+この記事は Scala Advent Calendar 2025 の 7 日目です。  
+n 番煎じな記事ですが、せっかく空いているならと思い滑り込みました。
+
+https://qiita.com/advent-calendar/2025/scala
 
 # はじめに
 
@@ -14,6 +19,10 @@ Scala というか JVM 関連の言語で定番なのかなと思っているマ
 https://github.com/openjdk/jmh
 
 https://github.com/sbt/sbt-jmh
+
+個人的には元々 Scala Meter をいうベンチマークツールを使っていたのですが、Scala3 対応が遅れている(？)ので、依存しない何かはないかと思い調べたら出てきたというのもあり、試してみた次第です。
+
+https://zenn.dev/ara_ta3/articles/scala-meter-getting-started
 
 今回利用したコードは以下の Repository に置いてあります。
 
@@ -85,6 +94,7 @@ final class CachedFibonacci(cache: mutable.Map[Int, Long] = mutable.Map(0 -> 0L,
 ```
 
 JMH 側のクラスでだけアノテーションを付け、プロダクションコードには一切 JMH 依存を入れません。`@Param` で入力サイズを変え、`@Setup(Level.Iteration)` で毎イテレーションごとに新しいキャッシュを作っています。
+結果を Blackhole.consume に対して渡さないとコードが Dead Code として認識され、削除されることにより、意図せずパフォーマンスが上がったかのような結果になってしまうため必要ということを書きながら知りました。
 
 ```scala
 // src/bench/scala/example/FibonacciBenchmark.scala
