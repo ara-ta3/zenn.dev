@@ -120,9 +120,31 @@ sbt "jmh:run -i 5 -wi 3 -f1 -t1 .*FibonacciBenchmark.*"
 手元ではこんな結果になりました（数字は環境によります）。
 
 ```
-Benchmark                     Mode  Cnt        Score        Error  Units
-FibonacciBenchmark.before     avgt    5  1200000.000 ±  15000.000  ns/op
-FibonacciBenchmark.after      avgt    5     8000.000 ±    200.000  ns/op
+[info] # Warmup Iteration   1: 10539.905 ns/op
+[info] # Warmup Iteration   2: 10544.390 ns/op
+[info] # Warmup Iteration   3: 10476.753 ns/op
+[info] Iteration   1: 10444.895 ns/op
+[info] Iteration   2: 10411.597 ns/op
+[info] Iteration   3: 10536.046 ns/op
+[info] Iteration   4: 10450.510 ns/op
+[info] Iteration   5: 10429.743 ns/op
+[info] Result "example.FibonacciBenchmark.before":
+[info]   10454.558 ±(99.9%) 184.786 ns/op [Average]
+[info]   (min, avg, max) = (10411.597, 10454.558, 10536.046), stdev = 47.988
+[info]   CI (99.9%): [10269.772, 10639.345] (assumes normal distribution)
+
+[info] # Warmup Iteration   1: 1.450 ns/op
+[info] # Warmup Iteration   2: 2.345 ns/op
+[info] # Warmup Iteration   3: 2.034 ns/op
+[info] Iteration   1: 1.969 ns/op
+[info] Iteration   2: 1.981 ns/op
+[info] Iteration   3: 2.046 ns/op
+[info] Iteration   4: 2.020 ns/op
+[info] Iteration   5: 1.985 ns/op
+[info] Result "example.FibonacciBenchmark.after":
+[info]   2.000 ±(99.9%) 0.123 ns/op [Average]
+[info]   (min, avg, max) = (1.969, 2.000, 2.046), stdev = 0.032
+[info]   CI (99.9%): [1.877, 2.123] (assumes normal distribution)
 ```
 
 `before`（キャッシュなし）は指数的に時間が伸び、`after`（キャッシュあり）は線形時間になり、大きな差が出ているのがわかります。
