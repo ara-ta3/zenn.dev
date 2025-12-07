@@ -3,7 +3,7 @@ title: "Scala 3 + JMH を最短でセットアップする ~ sbt-jmh の最小�
 emoji: "⏱️"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Scala", "JMH", "Benchmark"]
-published: false
+published: true
 ---
 
 この記事は Scala Advent Calendar 2025 の 7 日目です。  
