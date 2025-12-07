@@ -8,7 +8,7 @@ published: false
 
 # はじめに
 
-Scala で定番のマイクロベンチマークツール JMH を試したときのメモです。  
+Scala というか JVM 関連の言語で定番なのかなと思っているマイクロベンチマークツール JMH を試したときの備忘録です。  
 `sbt-jmh` を使うと sbt からベンチマークを測るコマンドが使えるので便利でした。
 
 https://github.com/openjdk/jmh
@@ -127,10 +127,10 @@ class FibonacciBenchmark {
 
 # 3. 実行してみる
 
-`jmh:run` でベンチマークを実行できます。フィルタを付けると対象を絞れます。
+`Jmh/run` でベンチマークを実行できます。フィルタを付けると対象を絞れます。
 
 ```bash
-sbt "jmh:run -i 3 -wi 1 -f 1 -t 1 .*FibonacciBenchmark.*"
+sbt "Jmh/run -i 3 -wi 1 -f 1 -t 1 .*FibonacciBenchmark.*"
 ```
 
 - `-i 3`: 本計測のイテレーション数
@@ -138,7 +138,10 @@ sbt "jmh:run -i 3 -wi 1 -f 1 -t 1 .*FibonacciBenchmark.*"
 - `-f 1`: fork の回数
 - `-t 1`: スレッド数
 
-手元ではこんな結果になりました（数字は環境によります）。
+ベンチマーク名やメソッドをリネームしたのに前のコードが走る場合、JMH の生成コードやコンパイル成果物が `target/` に残っている可能性があります。  
+なので、`sbt Jmh/clean` → `sbt Jmh/compile`で再生成すると反映されます。全スコープを掃除したいときは `sbt clean` でも問題ありません。
+
+手元ではこんな結果になりました。
 
 ```
 [info] Benchmark                           (n)  Mode  Cnt         Score         Error  Units
@@ -155,14 +158,8 @@ sbt "jmh:run -i 3 -wi 1 -f 1 -t 1 .*FibonacciBenchmark.*"
 
 `implementation1`（素朴再帰）は指数的に時間が伸びて厳しく、`implementation2`（末尾再帰）は線形で数ナノ秒程度に収まり、`implementation3`（キャッシュあり）はほぼ同水準かわずかに速い、という差が見えます（今回は各イテレーションでキャッシュを作り直しているため、キャッシュの恩恵は小さめ）。
 
-# 4. 小ネタ
+# 4. まとめ
 
-- `jmh:compile` で事前に JMH のコード生成だけ行い、後で `jmh:runMain` で実行することも可能
-- `Jmh / javaOptions += "-Xmx2g"` のように、計測用の JVM オプションを個別に付けられる
-- Scala 3 でも sbt-jmh がそのまま使えるので、Kotlin/Java のコードと混ぜて比較するときに便利
-
-# 5. まとめ
-
-- sbt-jmh を入れると sbt からすぐベンチマークを回せる
-- `Blackhole` で最適化を防ぐのが鉄則
+- sbt-jmh を入れると sbt からすぐベンチマークを回せて便利
 - `-i` や `-wi` を調整して、手元の環境で安定する回数を見つけると良さそう
+- Jmh / unmanagedSourceDirectories の設定追加によってディレクトリを分けておくとベンチマークのコードが分離出来て便利
