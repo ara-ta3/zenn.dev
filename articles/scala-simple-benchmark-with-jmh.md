@@ -141,10 +141,16 @@ sbt "jmh:run -i 3 -wi 1 -f 1 -t 1 .*FibonacciBenchmark.*"
 手元ではこんな結果になりました（数字は環境によります）。
 
 ```
-Benchmark                              Mode  Cnt        Score        Error  Units
-FibonacciBenchmark.implementation1     avgt    5  1200000.000 ±  15000.000  ns/op
-FibonacciBenchmark.implementation2     avgt    5       50.000 ±      2.000  ns/op
-FibonacciBenchmark.implementation3     avgt    5        8.000 ±      0.200  ns/op
+[info] Benchmark                           (n)  Mode  Cnt         Score         Error  Units
+[info] FibonacciBenchmark.implementation1   20  avgt    3     10940.873 ±     771.730  ns/op
+[info] FibonacciBenchmark.implementation1   30  avgt    3   1291339.533 ±  138631.600  ns/op
+[info] FibonacciBenchmark.implementation1   35  avgt    3  14861651.639 ± 6639040.520  ns/op
+[info] FibonacciBenchmark.implementation2   20  avgt    3         2.204 ±       2.782  ns/op
+[info] FibonacciBenchmark.implementation2   30  avgt    3         3.100 ±       1.506  ns/op
+[info] FibonacciBenchmark.implementation2   35  avgt    3         2.763 ±       0.728  ns/op
+[info] FibonacciBenchmark.implementation3   20  avgt    3         1.922 ±       0.283  ns/op
+[info] FibonacciBenchmark.implementation3   30  avgt    3         2.009 ±       0.632  ns/op
+[info] FibonacciBenchmark.implementation3   35  avgt    3         2.012 ±       0.505  ns/op
 ```
 
 `implementation1`（素朴再帰）は指数的に時間が伸び、`implementation2`（末尾再帰）は線形になって大幅に改善し、`implementation3`（キャッシュあり）はさらに速い、という差が見えます。
