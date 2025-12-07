@@ -153,7 +153,7 @@ sbt "jmh:run -i 3 -wi 1 -f 1 -t 1 .*FibonacciBenchmark.*"
 [info] FibonacciBenchmark.implementation3   35  avgt    3         2.012 ±       0.505  ns/op
 ```
 
-`implementation1`（素朴再帰）は指数的に時間が伸び、`implementation2`（末尾再帰）は線形になって大幅に改善し、`implementation3`（キャッシュあり）はさらに速い、という差が見えます。
+`implementation1`（素朴再帰）は指数的に時間が伸びて厳しく、`implementation2`（末尾再帰）は線形で数ナノ秒程度に収まり、`implementation3`（キャッシュあり）はほぼ同水準かわずかに速い、という差が見えます（今回は各イテレーションでキャッシュを作り直しているため、キャッシュの恩恵は小さめ）。
 
 # 4. 小ネタ
 
