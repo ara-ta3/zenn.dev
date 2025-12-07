@@ -130,13 +130,13 @@ class FibonacciBenchmark {
 `jmh:run` でベンチマークを実行できます。フィルタを付けると対象を絞れます。
 
 ```bash
-sbt "jmh:run -i 3 -wi 1 -f1 -t1 .*FibonacciBenchmark.*"
+sbt "jmh:run -i 3 -wi 1 -f 1 -t 1 .*FibonacciBenchmark.*"
 ```
 
 - `-i 3`: 本計測のイテレーション数
 - `-wi 1`: ウォームアップ回数
-- `-f1`: fork の回数
-- `-t1`: スレッド数
+- `-f 1`: fork の回数
+- `-t 1`: スレッド数
 
 手元ではこんな結果になりました（数字は環境によります）。
 
