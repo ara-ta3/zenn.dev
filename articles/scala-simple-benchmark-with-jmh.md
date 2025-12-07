@@ -20,7 +20,7 @@ https://github.com/openjdk/jmh
 
 https://github.com/sbt/sbt-jmh
 
-個人的には元々 Scala Meter をいうベンチマークツールを使っていたのですが、Scala3 対応が遅れている(？)ので、依存しない何かはないかと思い調べたら出てきたというのもあり、試してみた次第です。
+個人的には元々 Scala Meter というベンチマークツールを使っていたのですが、Scala 3 対応がまだ追いついていない印象があり、代替として別のツールを調べていたところ、JMH にたどり着き、sbt-jmh がシンプルで良かったため今回触ってみました。
 
 https://zenn.dev/ara_ta3/articles/scala-meter-getting-started
 
@@ -55,8 +55,11 @@ lazy val root = (project in file("."))
 ```
 
 `Test / fork := true` は、テスト（および test タスクにぶら下がるプラグイン動作）を sbt 本体とは別 JVM で実行する設定です。テスト実行時のクラスパス汚染や JVM オプションの影響が sbt セッションに漏れないので、特にベンチマークのように GC 設定やヒープサイズを変えたいときに便利という理解でいます。
-今回はソースコードとは別に bench というディレクトリを作成し、そこにベンチマークのコードを書くことにしました。  
-そのため、 `Jmh / unmanagedSourceDirectories += baseDirectory.value / "src" / "bench" / "scala"` という記述を追加しています。
+なお、JMH はベンチマーク実行時に独自に fork（別 JVM 起動）を行うため、`Test / fork := true`s は必須ではありません。
+今回はテストタスクと sbt 本体の JVM を分離する目的で付けています。
+
+今回はプロダクションコードと完全に分離するため、src/bench/scala に JMH 専用コードを配置する構成にしました。
+sbt-jmh は src/jmh のようなデフォルトディレクトリを持たないため、unmanagedSourceDirectories で明示的に追加しています。
 
 # 2. 実装サンプルコードとベンチマーク計測用の記述を書く
 
@@ -94,7 +97,9 @@ final class CachedFibonacci(cache: mutable.Map[Int, Long] = mutable.Map(0 -> 0L,
 ```
 
 JMH 側のクラスでだけアノテーションを付け、プロダクションコードには一切 JMH 依存を入れません。`@Param` で入力サイズを変え、`@Setup(Level.Iteration)` で毎イテレーションごとに新しいキャッシュを作っています。
-結果を Blackhole.consume に対して渡さないとコードが Dead Code として認識され、削除されることにより、意図せずパフォーマンスが上がったかのような結果になってしまうため必要ということを書きながら知りました。
+なお、JMH では計測対象の結果を Blackhole.consume に渡す必要があります。
+そうしないと、JIT によって「結果が使われていない = 不要」と判断され、コードが削除されてしまいます。
+その場合、意図しない高速化が起きるため、ベンチマークとして正しい値が出ません。
 
 ```scala
 // src/bench/scala/example/FibonacciBenchmark.scala
@@ -170,6 +175,6 @@ sbt "Jmh/run -i 3 -wi 1 -f 1 -t 1 .*FibonacciBenchmark.*"
 
 # 4. まとめ
 
-- sbt-jmh を入れると sbt からすぐベンチマークを回せて便利
-- `-i` や `-wi` を調整して、手元の環境で安定する回数を見つけると良さそう
-- Jmh / unmanagedSourceDirectories の設定追加によってディレクトリを分けておくとベンチマークのコードが分離出来て便利
+- sbt-jmh は導入が軽く、Scala 3 でも問題なく動作する
+- ベンチマーク専用ディレクトリを分ければプロダクションコードにも影響しない
+- Scala Meter が使いにくい場合の選択肢として十分実用的
