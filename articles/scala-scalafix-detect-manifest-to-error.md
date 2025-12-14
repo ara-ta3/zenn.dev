@@ -1,5 +1,5 @@
 ---
-title: "Scala 2.13でscalafixのカスタムRuleを使いscala.reflect.Manifest使用を検知する"
+title: "Scala 2.13で Scalafix カスタムルールを使い scala.reflect.Manifest の使用を検知する"
 emoji: "😎"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["scala", "scalafix", "json4s", "scala3"]
