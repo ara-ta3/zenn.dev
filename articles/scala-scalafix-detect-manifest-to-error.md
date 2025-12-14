@@ -1,5 +1,5 @@
 ---
-title: "Scala 2.13でscalafix Semantic Ruleを使いManifest使用を検知する"
+title: "Scala 2.13でscalafixのカスタムRuleを使いscala.reflect.Manifest使用を検知する"
 emoji: "😎"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["scala", "scalafix", "json4s", "scala3"]
@@ -7,6 +7,10 @@ published: false
 ---
 
 ## はじめに
+
+この記事は Scala Advent Calendar 2025 の 15 日目の記事です。
+
+https://qiita.com/advent-calendar/2025/scala
 
 Scala 2.13 プロジェクトで json4s を使っているんですが、ライブラリを使う部分で `Manifest` に依存している部分があり、それを機械的に検知したくなりました。  
 grep などでも一定の範囲では出来ますが、コード全体で確かに全てを解消できたかの保証が欲しいと感じ、 **scalafix カスタム Rule** で検知することにしました。  
@@ -21,7 +25,7 @@ https://github.com/ara-ta3/scala-validate-manifest-sample
 
 ```bash
 sbt example/compile
-sbt "example/scalafix --check"
+sbt example/scalafix
 ```
 
 ## 検証リポジトリの構成
@@ -156,15 +160,13 @@ class NoManifestRule extends SemanticRule("NoManifestRule") {
 
 このルールは「文字列」ではなく「シンボル」で判定することで、alias や implicit 経由でも確実に拾う、という意図です。
 
----
-
 ## 動かし方
 
 以下のコマンドで走らせます。
 
 ```bash
 sbt example/compile
-sbt "example/scalafix --check"
+sbt "example/scalafix"
 ```
 
 2 つ目のコマンドで `NoManifest` の Diagnostic が出て失敗する想定です。出力イメージ:
@@ -182,19 +184,29 @@ sbt:root> example/scalafix
 [error] Total time: 0 s, completed 2025/12/14 14:05:33
 ```
 
-これで **ローカルで Manifest が混入した瞬間にコンパイルを落とす** 仕組みができました。
-Manifest を消す（`import scala.reflect.Manifest` を削除し、`ClassTag` に書き換えるなど）と、そのまま `scalafix --check` が通るようになります。落ちる/通るの差分をすぐ確認できます。
+これにより **ローカルで Manifest が混入した瞬間にコンパイルを落とす** 仕組みができました。
+Manifest を消す（`import scala.reflect.Manifest` を削除し、`ClassTag` に書き換えるなど）と、そのまま `scalafix` が通るようになります。落ちる/通るの差分をすぐ確認できます。
 
 :::message
 semanticdb を使わない場合の余談
 
-- `sbt example/scalafix --check` を semanticdb 無効のまま実行すると、`MissingSemanticDBError: SemanticDB not found; compile with -Yrangepos and semanticdb` と言われて止まります。
-- 仮に semanticdb を使わず AST だけでマッチすると、`import scala.reflect.{ Manifest => M }` の alias や implicit parameter 経由の `Manifest` を検知できません。
+`sbt example/scalafix` を semanticdb 無効のまま実行するとエラーで止まります
 
-「漏れなく検知してビルドを落とす」用途では semanticdb 前提の Semantic Rule が現実的です。
+```
+[error] (example / Compile / scalafix) scalafix.sbt.InvalidArgument: The scalac compiler should produce semanticdb files to run semantic rules like NoManifestRule.
+[error] To fix this problem for this sbt shell session, run `scalafixEnable` and try again.
+[error] To fix this problem permanently for your build, add the following settings to build.sbt:
+[error]
+[error] inThisBuild(
+[error]   List(
+[error]     scalaVersion := "2.13.18",
+[error]     semanticdbEnabled := true,
+[error]     semanticdbVersion := scalafixSemanticdb.revision
+[error]   )
+[error] )
+```
+
 :::
-
----
 
 ## まとめ
 
