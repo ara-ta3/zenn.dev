@@ -1,0 +1,222 @@
+---
+title: "Scala 2.13で Scalafix カスタムルールを使い scala.reflect.Manifest の使用を検知する"
+emoji: "😎"
+type: "tech" # tech: 技術記事 / idea: アイデア
+topics: ["scala", "scalafix", "json4s", "scala3"]
+published: true
+---
+
+## はじめに
+
+この記事は Scala Advent Calendar 2025 の 15 日目の記事です。
+
+https://qiita.com/advent-calendar/2025/scala
+
+Scala 2.13 プロジェクトで json4s を使っているんですが、ライブラリを使う部分で `Manifest` に依存している部分があり、それを機械的に検知したくなりました。
+Scala 2 系では `implicit mf: Manifest[A]` のように書くと、コンパイラが型引数 `A` を元に `Manifest[A]` を裏で生成して渡してくれていました。
+しかしこの仕組みは deprecated とされており、Scala 3 では前提にできません。
+https://docs.scala-lang.org/overviews/reflection/typetags-manifests.html
+
+そこで対応するべき箇所が洗いざらい対応できているかを確認したくなり、今回の方法に至りました。  
+grep などでも一定の範囲では出来ますが、コード全体で確かに全てを解消できたかの保証が欲しいと感じ、 **scalafix カスタムルール** で検知することにしました。  
+今回はそのカスタムルールをプロジェクトに取り入れてコマンドでエラーに落とすところまでの流れをサンプルコードと共に示すのがゴールです。
+
+書いたコードはこちらに置きました。
+
+https://github.com/ara-ta3/scala-validate-manifest-sample
+
+すぐ試すなら以下の 2 コマンドです。
+2 本目のコマンドで Manifest 検出のエラーが出ます。
+
+```bash
+sbt example/compile
+sbt example/scalafix
+```
+
+## 検証リポジトリの構成
+
+構成は次のとおりです。
+
+```
+.
+├─ project/plugins.sbt      # sbt-scalafix 0.14.4
+├─ build.sbt                # semanticdb とルールの classpath 設定
+├─ .scalafix.conf           # ルール有効化
+├─ rules/                   # カスタムルール本体
+│   └─ src/main/scala/fix/NoManifestRule.scala
+└─ example/                 # ルールを当てるサンプル（json4s）
+    └─ src/main/scala/Json4sExample.scala
+```
+
+設定で触るファイルは主に次の 4 つです。
+
+- `project/plugins.sbt`: sbt-scalafix プラグインを入れる
+- `build.sbt`: semanticdb 有効化とルール jar を classpath に載せる設定
+- `.scalafix.conf`: 使うルールを宣言
+- `rules/src/main/scala/fix/NoManifestRule.scala`: ルール実装本体
+
+### 対象コード
+
+サンプルコードとして json4s で String を extract する関数を用意しました。  
+以下に対して scalafix を実行し検知することをゴールとします。
+
+```scala
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
+import scala.reflect.Manifest
+
+object Json4sExample {
+  implicit val formats: Formats = DefaultFormats
+
+  def decode[A](json: String)(implicit mf: Manifest[A]): A =
+    parse(json).extract[A]
+
+  def main(args: Array[String]): Unit = {
+    val json = """{"name":"example","value":1}"""
+    val result = decode[Map[String, Any]](json)
+    println(result)
+  }
+}
+```
+
+### プラグインとビルド設定
+
+`project/plugins.sbt`
+
+```scala
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.14.4")
+```
+
+`build.sbt`（ポイントのみ抜粋）
+
+```scala
+ThisBuild / scalaVersion := "2.13.18"
+
+lazy val rules = project.in(file("rules")).settings(
+  libraryDependencies += "ch.epfl.scala" %% "scalafix-core" % "0.14.4"
+)
+
+lazy val example = project.in(file("example")).settings(
+  semanticdbEnabled := true,
+  semanticdbVersion := scalafixSemanticdb.revision,
+  scalacOptions += "-Yrangepos",
+  libraryDependencies += "org.json4s" %% "json4s-jackson" % "4.0.7",
+  scalafixDependencies += {
+    val jar = (rules / crossTarget).value / s"${(rules / moduleName).value}_${scalaBinaryVersion.value}-${version.value}.jar"
+    ("local" %% "no-manifest-rule" % version.value).intransitive().from(jar.toURI.toString)
+  },
+  // scalafix 実行前にルール jar を自動ビルド
+  Compile / scalafix := (Compile / scalafix).dependsOn(rules / Compile / packageBin).evaluated,
+  Test    / scalafix := (Test    / scalafix).dependsOn(rules / Compile / packageBin).evaluated
+)
+```
+
+- `semanticdbEnabled` と `semanticdbVersion` で semantic 情報を出力
+- `scalafixDependencies` で、ローカルでビルドしたルール jar を classpath に載せる
+- `Compile / scalafix := ...dependsOn(packageBin)` で、`sbt example/scalafix` 実行時にルールが自動ビルドされる
+
+ルートの `.scalafix.conf` でルールを有効化しています。
+
+```hocon
+rules = [
+  NoManifestRule
+]
+```
+
+### カスタムルール本体
+
+`rules/src/main/scala/fix/NoManifestRule.scala`
+
+```scala
+package fix
+
+import scalafix.v1._
+import scala.meta._
+
+class NoManifestRule extends SemanticRule("NoManifestRule") {
+  private val forbidden = List(
+    SymbolMatcher.normalized("scala.reflect.Manifest#"),
+    SymbolMatcher.normalized("scala.reflect.Manifest."),
+    SymbolMatcher.normalized("scala.reflect.ClassManifest#"),
+    SymbolMatcher.normalized("scala.reflect.ClassManifest.")
+  )
+
+  override def fix(implicit doc: SemanticDocument): Patch =
+    doc.tree.collect {
+      case name: Name if isForbidden(name) =>
+        Patch.lint(
+          Diagnostic(
+            id = "NoManifest",
+            message = s"scala.reflect.${name.value} の使用は禁止されています。",
+            position = name.pos
+          )
+        )
+    }.asPatch
+
+  private def isForbidden(name: Name)(implicit doc: SemanticDocument): Boolean =
+    name.symbol match {
+      case Symbol.None => false
+      case sym         => forbidden.exists(_.matches(sym))
+    }
+}
+```
+
+`SymbolMatcher.normalized` で import alias 後のシンボルに対しても確実にマッチさせています。`Patch.lint` を返すことで、検知した瞬間に scalafix が失敗します。
+
+このルールは「文字列」ではなく「シンボル」で判定することで、alias や implicit 経由でも確実に拾う、という意図です。
+
+## 動かし方
+
+以下のコマンドで走らせます。
+
+```bash
+sbt example/compile
+sbt example/scalafix
+```
+
+2 つ目のコマンドで `NoManifest` の Diagnostic が出て失敗します。
+
+```
+sbt:root> example/scalafix
+[info] Running scalafix on 1 Scala sources
+[error] /path/to/github.com/ara-ta3/scala-validate-manifest-sample/example/src/main/scala/Json4sExample.scala:3:22: error: [NoManifestRule.NoManifest] scala.reflect.Manifest の使用は禁止されています。
+[error] import scala.reflect.Manifest
+[error]                      ^^^^^^^^
+[error] /path/to/github.com/ara-ta3/scala-validate-manifest-sample/example/src/main/scala/Json4sExample.scala:8:44: error: [NoManifestRule.NoManifest] scala.reflect.Manifest の使用は禁止されています。
+[error]   def decode[A](json: String)(implicit mf: Manifest[A]): A =
+[error]                                            ^^^^^^^^
+[error] (example / Compile / scalafix) scalafix.sbt.ScalafixFailed: LinterError
+[error] Total time: 0 s, completed 2025/12/14 14:05:33
+```
+
+これにより **ローカルで Manifest が混入した瞬間にコンパイルを落とす** 仕組みができました。
+Manifest を消す（`import scala.reflect.Manifest` を削除し、`ClassTag` に書き換えるなど）と、そのまま `scalafix` が通るようになります。落ちる/通るの差分をすぐ確認できます。
+※ json4s の警告メッセージ上では `Manifest` の代替として `ClassTag` への実装などが推奨されているため、まずは `ClassTag` への置き換えを目指すのが現実的と考えています。
+
+:::message
+semanticdb を使わない場合の余談
+
+`sbt example/scalafix` を semanticdb 無効のまま実行するとエラーで止まります
+
+```
+[error] (example / Compile / scalafix) scalafix.sbt.InvalidArgument: The scalac compiler should produce semanticdb files to run semantic rules like NoManifestRule.
+[error] To fix this problem for this sbt shell session, run `scalafixEnable` and try again.
+[error] To fix this problem permanently for your build, add the following settings to build.sbt:
+[error]
+[error] inThisBuild(
+[error]   List(
+[error]     scalaVersion := "2.13.18",
+[error]     semanticdbEnabled := true,
+[error]     semanticdbVersion := scalafixSemanticdb.revision
+[error]   )
+[error] )
+```
+
+:::
+
+## まとめ
+
+semanticdb + scalafix の Semantic Rule で、import alias/implicit 経由でも `Manifest` を検知出来るようになりました。  
+この設定を CI に組み込めば、Manifest が混入した瞬間にビルドを落とすこともできます。
+Scala3 移行のために機械的に検出したい際に使えると良いなと思います。  
+また、Scalafix のカスタムルールを作るのも容易だったので、何かしら禁止にしたいことや Scala3 移行で困ることがあれば使っていきたいなと思いました。
