@@ -1,51 +1,24 @@
 ---
-title: "Scala 2.13でscalafix Semantic Ruleを使いManifest使用を検知する"
+title: "Scala 2.13でscalafixを使いscala.reflect.Manifest使用を検知する"
 emoji: "😎"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["scala", "scalafix", "json4s", "scala3"]
 published: false
 ---
 
-## この記事でやること
+## はじめに
 
-- Scala 2.13 プロジェクトで `Manifest` / `ClassManifest` を **scalafix カスタム Semantic Rule** で検知して落とす
-- import alias や implicit 経由の利用も取りこぼさない
-- 検証用リポジトリ（<https://github.com/ara-ta3/scala-validate-manifest-sample>）のコードをベースに解説
+Scala 2.13 プロジェクトで json4s を使っているんですが、ライブラリを使う部分で `Manifest` に依存している部分があり、それを機械的に検知したくなりました。
+grep などでも一定の範囲では出来ますが、コード全体で確かに全てを解消できたかの保証が欲しいと感じ、 **scalafix カスタム Rule** で検知することにしました。  
+今回はそのカスタムルールをプロジェクトに取り入れてコマンドでエラーに落とすところまでの流れをサンプルコードと共に示すのがゴールです。
 
-CI を使わず、まずはローカルで確実に落ちるところまでをゴールにします。
+書いたコードはこちらに置きました。
 
----
-
-## 背景
-
-歴史の長いコードや `json4s` でシリアライズを書いたコードには、いまだに `scala.reflect.Manifest` / `ClassManifest` が残っていることがあります。
-
-- Scala 3 では非推奨（削除方向）
-- `ClassTag` / `TypeTag` への移行を妨げる
-- grep や目視レビューでは alias/implicit に埋もれて見落としがち
-
-このため、**ツールで確実に検知しビルドを失敗させたい**というニーズがあります。
-
----
-
-## なぜ単純検索では見逃すのか
-
-```scala
-import scala.reflect.{ Manifest => M }
-
-def decode[A: M](json: String) = ???
-```
-
-表面上は `Manifest` という単語が消えています。`Type.Name("Manifest")` の AST マッチや grep ではすり抜けます。  
-「それが本当に `scala.reflect.Manifest` か」を import 解決後のシンボルで判定する必要があります。
-
-ここで semanticdb（型・シンボル情報付きのデータベース）を出力し、scalafix の **Semantic Rule** でシンボルマッチを行います。
-
----
+https://github.com/ara-ta3/scala-validate-manifest-sample
 
 ## 検証リポジトリの構成
 
-<https://github.com/ara-ta3/scala-validate-manifest-sample> をそのまま使います。構成は次のとおりです。
+構成は次のとおりです。
 
 ```
 .
@@ -56,6 +29,27 @@ def decode[A: M](json: String) = ???
 │   └─ src/main/scala/fix/NoManifestRule.scala
 └─ example/                 # ルールを当てるサンプル（json4s）
     └─ src/main/scala/Json4sExample.scala
+```
+
+### 対象コード
+
+```scala
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
+import scala.reflect.Manifest
+
+object Json4sExample {
+  implicit val formats: Formats = DefaultFormats
+
+  def decode[A](json: String)(implicit mf: Manifest[A]): A =
+    parse(json).extract[A]
+
+  def main(args: Array[String]): Unit = {
+    val json = """{"name":"example","value":1}"""
+    val result = decode[Map[String, Any]](json)
+    println(result)
+  }
+}
 ```
 
 ### プラグインとビルド設定
@@ -177,7 +171,7 @@ sbt "example/scalafix --check"
 
 ---
 
-## まとめと拡張アイデア
+## まとめ
 
 - semanticdb + scalafix の Semantic Rule で、import alias/implicit 経由でも `Manifest` / `ClassManifest` を確実に検知できる
 - ルール jar を自動ビルドする設定にしておくと、ルールの配置を意識せずに使える
