@@ -8,6 +8,7 @@ overrides:
   '@modelcontextprotocol/sdk@<1.25.2': '>=1.25.2'
   body-parser@>=2.2.0 <2.2.1: '>=2.2.1'
   brace-expansion@>=2.0.0 <=2.0.1: '>=2.0.2'
+  hono@<4.11.4: '>=4.11.4'
   js-yaml@<3.14.2: '>=3.14.2'
   js-yaml@>=4.0.0 <4.1.1: '>=4.1.1'
   qs@<6.14.1: '>=6.14.1'
@@ -62,7 +63,7 @@ packages:
     resolution: {integrity: sha512-0/g2lIOPzX8f3vzW1ggQgvG5mjtFBDBHFAzI5SFAi2DzSqS9luJwqg9T6O/gKYLi+inS7eNxBeIFkkghIPvrMA==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
-      hono: ^4
+      hono: '>=4.11.4'
 
   '@isaacs/cliui@8.0.2':
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
