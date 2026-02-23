@@ -2,7 +2,7 @@
 title: "docker-compose前提のモノレポで Codexアプリ × git-wt による並列開発を回す"
 emoji: "😸"
 type: "tech" # tech: 技術記事 / idea: アイデア
-topics: ["git", "gitworktree", "codex", "monorepo"]
+topics: ["git", "gitworktree", "codex", "monorepo", "dockercompose"]
 published: false
 ---
 
@@ -157,5 +157,7 @@ function gwreview () {
 
 ## まとめ
 
-Codexアプリをgitのworktree上で開発するときの一例を紹介しました。  
-git worktreeの活用方法のイメージや、並列開発時の各環境でのテストが重いときなどに参考になれば幸いです。
+Codexアプリと git-wt を使った並列開発の一例を紹介しました。  
+docker-compose 前提のモノレポ構成では、 各worktreeで同じ環境を立てるのは現実的ではないため、  
+検証はメインワークツリーに寄せる、という運用にしています。  
+同じような構成で似たような困り事がある方の参考になれば幸いです。
