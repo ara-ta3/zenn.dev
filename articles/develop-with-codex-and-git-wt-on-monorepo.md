@@ -1,5 +1,5 @@
 ---
-title: "docker-compose前提のモノレポでCodexアプリとgit-wtやCodexアプリのworktree機能で並列開発を回す"
+title: "docker-compose前提のモノレポで Codexアプリ × git-wt による並列開発を回す"
 emoji: "😸"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["git", "gitworktree", "codex", "monorepo"]
