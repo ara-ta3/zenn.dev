@@ -148,7 +148,7 @@ function gg () {
 ```zsh
 function gwreview () {
 	local b=$1
-	git switch -C review/$b $b
+	git switch -c review/$b $b
 }
 ```
 
