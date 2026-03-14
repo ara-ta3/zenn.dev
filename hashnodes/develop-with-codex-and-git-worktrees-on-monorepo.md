@@ -106,6 +106,12 @@ But once I looked closely, it relies on `git worktree`, so worktrees created the
 That said, as far as I can tell right now, I haven’t found a flow in the Codex app that creates a branch first when starting worktree-based tasks.  
 So when I want branch-first workflows, creating them beforehand with `git-wt` feels easier.
 
+:::message
+Later on, I noticed that the Codex app actually does have a branch creation entry point near the top of the UI.  
+So these days I think of the split more like this: use the Codex app for branch creation and Thread management, and keep `git-wt` around for moving across worktrees or terminal-first operations.  
+Especially, `git wt <name>` still earns its place because it jumps to an existing worktree and creates one if it does not exist yet.
+:::
+
 On the other hand, worktrees created with `git-wt` need to be added manually to Codex app Threads, which is a bit inconvenient.  
 For now I split usage like this: "use `git-wt` when I want to create a branch first," and "use the Codex app when I prioritize Thread management."
 
@@ -155,4 +161,10 @@ For example, if I want to review `feature/add-login`, I run `gwreview feature/ad
 
 I introduced one example workflow for parallel development using the Codex app and `git-wt`.  
 In a `docker compose`-based monorepo, creating the same environment in every worktree is often unrealistic, so I centralize verification in the main worktree.  
+
+:::message
+This is a later addition, but the Codex app now also has a branch creation entry point, so starting worktree-based tasks directly from the app has become much easier.  
+At the same time, `git-wt` is still worth keeping around because it makes jumping between worktrees from the terminal much lighter.
+:::
+
 I hope this helps anyone facing similar issues in a similar setup.
