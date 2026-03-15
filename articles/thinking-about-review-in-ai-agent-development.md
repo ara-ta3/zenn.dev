@@ -2,7 +2,7 @@
 title: "AI Agent時代に、コードレビューが何を担っているのかを考えたい"
 emoji: "🧐"
 type: "idea" # tech: 技術記事 / idea: アイデア
-topics: ["ai", "review", "pullrequest", "engineering", "team"]
+topics: ["ai", "review", "codex", "claude", "engineering"]
 published: true
 ---
 
