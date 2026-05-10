@@ -1,17 +1,26 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "extends": [
-        "config:recommended"
+        "config:best-practices"
     ],
     "automerge": true,
     "timezone": "Asia/Tokyo",
     "separateMajorMinor": false,
+    "minimumReleaseAge": "3 days",
+    "vulnerabilityAlerts": {
+        "minimumReleaseAge": null
+    },
     "packageRules": [
         {
             "groupName": "all-packages",
             "matchPackageNames": [
                 "*"
             ]
+        },
+        {
+            "matchPackageNames": ["pnpm"],
+            "allowedVersions": "<11",
+            "matchManagers": ["npm"]
         }
     ],
     "lockFileMaintenance": {
