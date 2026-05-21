@@ -1,4 +1,4 @@
 overrides:
   fast-uri@<3.1.2: '>=3.1.2'
-  hono: 4.12.18
+  hono: 4.12.19
   ip-address@<10.1.1: '>=10.1.1'
