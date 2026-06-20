@@ -1,6 +1,6 @@
 overrides:
   brace-expansion@<5.0.6: '>=5.0.6'
   fast-uri@<3.1.2: '>=3.1.2'
-  hono: 4.12.21
+  hono: 4.12.25
   ip-address@<10.1.1: '>=10.1.1'
   qs@<6.15.2: '>=6.15.2'
