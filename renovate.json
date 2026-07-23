@@ -12,10 +12,14 @@
     },
     "packageRules": [
         {
-            "groupName": "all-packages",
+            "groupName": "npm-packages",
             "matchPackageNames": [
                 "*"
             ]
+        },
+        {
+            "groupName": "github-actions",
+            "matchManagers": ["github-actions"]
         },
         {
             "matchPackageNames": ["pnpm"],
