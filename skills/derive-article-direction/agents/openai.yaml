@@ -1,0 +1,4 @@
+interface:
+  display_name: "記事方針抽出"
+  short_description: "既存記事から次の記事の方向性を根拠と差分付きで整理する"
+  default_prompt: "$derive-article-direction を使って、このリポジトリの既存記事から次の記事の方向性を提案して。"
