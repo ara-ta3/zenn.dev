@@ -2,7 +2,7 @@ overrides:
   body-parser@<2.3.0: '>=2.3.0'
   brace-expansion@>=4.0.0 <5.0.9: '>=5.0.9'
   fast-uri@<4.1.2: '>=4.1.2'
-  hono: 4.13.2
+  hono: 4.13.3
   ip-address@<10.1.1: '>=10.1.1'
   qs@<6.15.2: '>=6.15.2'
   js-yaml@<5.2.2: '>=5.2.2'
