@@ -99,7 +99,7 @@ ScalaWind が生成する `src/main/scala/todo/scalawind.scala` は `.gitignore`
 
 ## 1. ブラウザが最初に読むファイルを用意する
 
-まず、ブラウザが読む HTML と JavaScript の入口を作ります。ブラウザは `index.html` を開き、そこから `main.js` を読みます。
+まず、ブラウザが最初に読む HTML と、そこから読み込む JavaScript を用意します。ブラウザは `index.html` を開き、そこから `main.js` を読みます。
 
 ```html:index.html
 <!doctype html>
@@ -123,7 +123,7 @@ import "./style.css";
 import "scalajs:main.js";
 ```
 
-`style.css` は後で Tailwind CSS に処理してもらう CSS の入口です。`scalajs:main.js` は、後で設定する Vite plugin が Scala.js の出力先に解決します。
+`style.css` は後で Tailwind CSS に処理してもらう CSS ファイルです。`scalajs:main.js` は、後で設定する Vite plugin が Scala.js の出力先に解決します。
 
 ## 2. ScalaをJavaScriptに変換し、Viteにつなぐ
 
@@ -403,10 +403,10 @@ Vite は Scala を直接コンパイルするものではありません。Vite 
 
 ## まとめ
 
-- Scala.js、現代でも普通に動きました。
-- React + Tailwind cssという環境で動く状況に非常に驚きました
-  - ~~もの好きがいるのは時が経っても同じですね~~
-- まずないかなと思いますがScala.jsをフロントエンドに使いたくなったときに参考になったら幸いです。
+Scala.js、現代でも普通に動きました。  
+React + Tailwind CSS という最近の環境でも動くことにとても驚きました。  
+~~もの好きがいるのは時が経っても同じですね。~~  
+まずないかなと思いますが、Scala.jsをフロントエンドに使いたくなった人の参考になれば幸いです。  
 
 ### 余談
 
