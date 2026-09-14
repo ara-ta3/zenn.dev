@@ -9,6 +9,10 @@ published: false
 ## はじめに
 
 最近個人でNekometry / KurashiLabというサービスを作っています。  
+
+- https://nekometry.com/
+- https://kurashilab.app/
+
 サービスを世の中に公開するとなるとサーバーなどが必要になりますが、最近だと多くのものが無料枠で実現可能になっています。  
 今回は、自分が開発からデプロイ、ホスティングまで無料でやっている範囲を整理がてら紹介していこうかなと思います。  
 実際に触ってはいないが検討したものも含まれます。  
@@ -18,14 +22,18 @@ published: false
 
 ```mermaid
 flowchart LR
-  developer[開発者（自分）] --> github[GitHub]
-  github --> actions[GitHub Actions]
-  actions --> pages[① Cloudflare Pages<br>静的ファイルの配信]
-  externalApi[外部 API など] --> actions
-  pages --> storage[② データ保存先]
-  user[ユーザ（ブラウザ）] --> feedback[④ Userbackによる<br>フィードバック]
+  developer[開発者] --> github[GitHub]
+
+  github -->|通常のデプロイ| pages[① Cloudflare Pages]
+  github -->|CI・定期処理| actions[GitHub Actions]
+
   runner[③ Oracle Cloud<br>Self-hosted Runner] --> actions
-  user --> pages
+  actions -.->|必要な場合は<br>wrangler deploy| pages
+
+  pages --> storage[② データ保存先]
+
+  user[ユーザ] --> pages
+  user --> feedback[④ Userback]
 ```
 
 この記事では、以下について書いていこうと思います。  
@@ -39,8 +47,7 @@ flowchart LR
 
 ## （1）Cloudflare Pages で静的ファイルを配信する
 
-基本的にSSG(Static Site Generation)でHTMLを生成し、それをホスティングする形にしています。  
-これはSEOの観点からSSGにしておいたほうが有利らしいという理解から概ねこうしています。  
+SEOや表示速度を考えて、基本的にはSSG（Static Site Generation）でHTMLを生成し、それをホスティングする形にしています。
 私がサービスを作る際は認証やデータの保持より先に、利用者へ価値を出せる部分があるはずだと考えており、そのため、Nekometry と KurashiLab では、認証やサーバー側のデータ保持を前提にしていません。
 そうなるとデータの保存に関しては必要がなくなり、データを取得しjson等で持っておいてSSGの際に埋め込めばいいじゃんと判断でき、HTMLのホスティングだけを考えれば良くなります。  
 
@@ -53,7 +60,7 @@ https://zenn.dev/ara_ta3/articles/typescript-vike-ssg-getting-started
 ## （2）データ保存先について検討する
 
 上の考え方なので、データ保存先はあまり使っていません。ただ、無料で始められる候補はいくつかあります。
-実際保持したくなったらどうするか考えていたときに出てきた選択肢としていくつかあるのでそれらを紹介できればと思います。  
+実際にデータを保持したくなった場合の選択肢として検討したものがいくつかあるので、それらを紹介します。
 
 無料枠は変更されることがあるため、ここでは 2026 年 9 月時点の公式ページを参照しています。
 初めに簡潔にまとめると以下のとおりです。  
@@ -84,7 +91,7 @@ D1 は CloudflareにおけるマネージドSQLiteのデータベースです。
 
 ブラウザから D1 へ直接アクセスするのではなく、Workers を API として挟みます。
 バックエンドのDBとしてD1を利用するというイメージですかね。  
-有料にしたとしても容量の限界があるらしく、増えていくデータの量によっては取らない方が良いかも知れませんが、初めに検証するには十分といえるでしょう。  
+有料にしたとしても10GBまでの容量の限界があるので、増えていくデータの量によっては取らない方が良いと思いますが、初めに検証するには十分といえるでしょう。  
 
 ### Supabase
 
@@ -100,12 +107,20 @@ SupabaseやFirebaseと同様にローカルで触れられるエミュレータ�
 
 https://zenn.dev/ara_ta3/articles/typescript-supabase-getting-started
 
-## （3）CI/CD として GitHub Actions を使い、Self-hosted Runner に Oracle Cloud を使う
+## （3）CI/CD と実行環境を無料で用意する
 
-### CI/CD: GitHub Actions + Oracle CloudのSelf-hosted Runner
+CI/CD 周りでは GitHub Actions と Cloudflare Pages の Git 連携を使っています。
 
-GitHub Actions は、ビルドやテストだけでなく、外部 API からのデータ取得やデプロイにも使っています。  
-Public Repository なら使いやすいですが、Private Repository では GitHub-hosted runner の無料枠に実行時間の制限があります。  
+役割としては、基本的に以下のように分けています。
+
+- テストやデータ取得などの CI・定期処理 → GitHub Actions
+- Cloudflare Pages でビルドできるもののデプロイ → Cloudflare Pages の Git 連携
+- Cloudflare Pages でビルドできないもののデプロイ → GitHub Actions でビルドして wrangler pages deploy
+
+### CI・定期処理: GitHub Actions + Oracle Cloud Self-hosted Runner
+
+GitHub Actions は、テストや外部 API からのデータ取得などに使っています。また、後述するようにCloudflare Pages上でビルドできないプロジェクトではデプロイにも利用しています。
+Public Repository なら使いやすいですが、Private Repository では GitHub-hosted Runner の無料枠に実行時間の制限があります。  
 
 以下の URL の通り、GitHub Free では、Private Repository の GitHub-hosted Runner に月 2,000 分、Actions の成果物と GitHub Packages を合わせて 500 MB の無料枠があります。Public Repository の標準 GitHub-hosted Runner と Self-hosted Runner は無料です。
 
@@ -130,9 +145,18 @@ https://docs.oracle.com/en-us/iaas/Content/Compute/References/arm.htm
 その後数ヶ月使っていますが請求はありません。  
 
 
-### CD: Cloudflare Pages の Git 連携
+### CD: 基本はCloudflare PagesのGit連携
 
 Cloudflare Pages は GitHub リポジトリと連携すると、push を起点にビルドとデプロイを実行します。静的ファイルの配信では、これを CD として使っています。
+そのため、Cloudflare Pages のビルド環境だけで完結できるプロジェクトでは、GitHub Actions からデプロイする必要はありません。  
+
+```
+GitHub
+↓ push
+Cloudflare Pages
+↓ build
+Deploy
+```
 
 以下の URL の通り、Cloudflare Pages のビルド環境には Go、Node.js、Bun、Python、Ruby が入っています。Node.js などは環境変数やバージョン指定ファイルで利用するバージョンを指定できます。
 
@@ -142,13 +166,31 @@ https://developers.cloudflare.com/pages/configuration/build-image/
 
 https://developers.cloudflare.com/pages/platform/limits/
 
-Previewのビルドも回数に含まれてしまうため、が不要なら、Preview ブランチのデプロイを止めておくのがおすすめです。
+Previewのビルドも回数に含まれてしまうため、不要ならPreview ブランチのデプロイを止めておくのがおすすめです。
 ブランチへの push ごとにビルドされるため、不要なビルドを減らせます。
 
-#### ビルド環境がない場合
+#### Cloudflare Pagesでビルドできない場合
 
+Cloudflare Pages のビルド環境だけではビルドできない場合があります。  
 TypeScriptのビルドは当然のように出来ますが、出来ない場合はwranglerなどを利用し、GitHub Actionsなどからデプロイする必要があります。  
-KurashiLabというサービスでは ~~何を思ったのか~~ Scala.jsを使っているので、以下のような形でdistディレクトリにHTMLを生成してあるという前提で、wrangler pages deployをかけるようなデプロイフローを書いています。
+KurashiLabというサービスでは ~~何を思ったのか~~ Scala.jsを使っているので、GitHub Actions の Self-hosted Runner 上でビルドしています。
+
+この場合は、
+
+```
+GitHub
+↓
+GitHub Actions
+↓
+Oracle Cloud Self-hosted Runner
+↓ build
+wrangler pages deploy
+↓
+Cloudflare Pages
+```
+
+という流れになります。
+そのため、KurashiLab では以下のように dist ディレクトリへHTMLなどを生成したあと、wrangler pages deploy でCloudflare Pagesへデプロイしています。
 
 ```zsh
 pnpm exec wrangler pages deploy path/to/dist --project-name=your-project-name
@@ -201,9 +243,9 @@ https://kurashilab.app/
 
 ## まとめ
 
-SSGでCloudflare Pagesにホスティングし、永続化なども視野に入れた構構の話をしました。  
+SSGでCloudflare Pagesにホスティングし、永続化なども視野に入れた構成の話をしました。  
 CI/CD周りはGitHub Actionsを使いつつSelf-hosted Runnerの話も触れました。  
-これらは全て無料で出来るし、サーバセキュリティとか考えなくて良いなとなったので本当に良い世の中になったなと思います。
-(Oracle CloudのInstanceはsshされないようにするとか一定のセキュリティ対策は自前で必要ですが。)
+これらは全て無料で出来るし、マネージドサービスを中心にすることで、自前でサーバを管理する範囲をかなり小さくできて、本当に便利な世の中になったなと思います。
+※Oracle CloudのInstanceはsshされないようにするとか一定のセキュリティ対策は自前で必要です。  
 AIの登場によってなにかサービスを作ってみようとするハードルがまた一段と下がったと思うので、個人開発してみたいと思う人が増えたら良いなと思いますし、その際の参考になったら幸いです。  
 
