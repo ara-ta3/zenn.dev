@@ -68,7 +68,7 @@ https://zenn.dev/ara_ta3/articles/typescript-vike-ssg-getting-started
 |候補|容量|読み取り・書き込み|ネットワーク|
 |---|---|---|---|
 |Cloud Firestore|保存 1 GiB|読み取り 50,000 回/日<br>書き込み・削除 各 20,000 回/日|外向き転送 10 GiB/月|
-|Cloudflare D1|保存 5 GB|読み取り 500 万行/日<br>書き込み 10 万行/日|D1 からのデータ転送は無料|
+|Cloudflare D1|1 DB あたり 500 MB<br>アカウント全体で 5 GB|読み取り 500 万行/日<br>書き込み 10 万行/日|D1 からのデータ転送は無料|
 |Supabase|PostgreSQL 500 MB、Storage 1 GB|API リクエストは無制限|外向き転送 5 GB|
 
 ### Cloud Firestore
@@ -85,6 +85,8 @@ https://firebase.google.com/docs/firestore/pricing
 ### Cloudflare Workers + D1
 
 https://developers.cloudflare.com/d1/platform/pricing/
+
+https://developers.cloudflare.com/d1/platform/limits/
 
 RDBMS が必要なら、Cloudflare Workers と D1 も候補になります。
 D1 は CloudflareにおけるマネージドSQLiteのデータベースです。
@@ -248,4 +250,3 @@ CI/CD周りはGitHub Actionsを使いつつSelf-hosted Runnerの話も触れま�
 これらは全て無料で出来るし、マネージドサービスを中心にすることで、自前でサーバを管理する範囲をかなり小さくできて、本当に便利な世の中になったなと思います。
 ※Oracle CloudのInstanceはsshされないようにするとか一定のセキュリティ対策は自前で必要です。  
 AIの登場によってなにかサービスを作ってみようとするハードルがまた一段と下がったと思うので、個人開発してみたいと思う人が増えたら良いなと思いますし、その際の参考になったら幸いです。  
-
