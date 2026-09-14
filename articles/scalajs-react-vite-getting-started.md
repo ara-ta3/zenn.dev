@@ -27,6 +27,10 @@ TODO アプリの作り方そのものよりも、Scala のコードがどこで
 
 ![TODO を追加・完了・削除できる画面](/images/scalajs-react/todo-app.png)
 
+今回使ったコードはこちらにあります。  
+
+https://github.com/ara-ta3/zlab-scalajs-react-getting-started
+
 今回の登場人物は以下です。
 
 - Scala.js: Scala を JavaScript に変換してブラウザで動かす仕組み
