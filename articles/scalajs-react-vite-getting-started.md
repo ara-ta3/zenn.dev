@@ -37,6 +37,32 @@ TODO アプリの作り方そのものよりも、Scala のコードがどこで
 - sbt: Scala のコードを JavaScript にビルドする
 - npm: React、Vite、Tailwind などの JavaScript 側の依存関係を取得する
 
+全体では、次のようにつながります。sbt と npm がそれぞれの依存関係を用意し、Vite が JavaScript と CSS をブラウザへ届けます。
+
+```mermaid
+flowchart TB
+  Scala[Scala のコード] --> Sbt[sbt]
+  Sbt --> ScalaJS[Scala.js]
+  ScalaJS --> JavaScript[JavaScript]
+
+  ScalaReact[scalajs-react] --> Scala
+
+  Npm[npm] --> React[React / react-dom]
+  Npm --> Vite[Vite]
+  Npm --> Tailwind[Tailwind CSS]
+  Npm --> ScalaWind[ScalaWind]
+
+  Tailwind --> CSS[CSS]
+  ScalaWind --> Tw[Scala の tw API]
+  Tw --> Scala
+
+  JavaScript --> Vite
+  React --> Vite
+  CSS --> Vite
+  Vite --> Browser[ブラウザ]
+  Browser --> DOM[React が DOM を描画]
+```
+
 最終的なディレクトリ構成は次のようになります。
 
 ```text
