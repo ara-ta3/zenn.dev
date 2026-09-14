@@ -29,12 +29,12 @@ TODO アプリの作り方そのものよりも、Scala のコードがどこで
 
 今回の登場人物は以下です。
 
-- Scala.js: Scala を JavaScript で動かすためのコンパイラと linker
+- Scala.js: Scala を JavaScript に変換してブラウザで動かす仕組み
 - scalajs-react: React の API を Scala から型安全に使うためのライブラリ
 - Vite: 開発サーバーと、ブラウザ向けアセットの配信・ビルド
 - Tailwind CSS: utility class から CSS を生成する仕組み
 - ScalaWind: Tailwind の class を Scala の型付き API として書くためのコード生成ツール
-- sbt: Scala.js のコンパイルと linker の実行
+- sbt: Scala のコードを JavaScript にビルドする
 - npm: React、Vite、Tailwind などの JavaScript 側の依存関係を取得する
 
 最終的なディレクトリ構成は次のようになります。
@@ -104,7 +104,7 @@ addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.22.0")
 ```
 
 ```text:project/build.properties
-sbt.version=1.10.11
+sbt.version=1.13.0
 ```
 
 ```scala:build.sbt
@@ -114,7 +114,7 @@ lazy val todoApp = project
   .in(file("."))
   .enablePlugins(ScalaJSPlugin)
   .settings(
-    scalaVersion := "3.3.3",
+    scalaVersion := "3.9.0",
     scalaJSUseMainModuleInitializer := true,
     scalaJSLinkerConfig ~= {
       _.withModuleKind(ModuleKind.ESModule)
@@ -129,7 +129,7 @@ lazy val todoApp = project
 
 `scalaJSUseMainModuleInitializer := true` は、生成された JavaScript を読み込んだときに Scala の `main` を実行する設定です。ESM で出力する設定は、Vite が JavaScript module として扱えるようにするためです。
 
-Vite plugin は `scalajs:main.js` を Scala.js linker の出力へつなぎます。
+Vite plugin は `scalajs:main.js` を sbt が生成する JavaScript へつなぎます。
 
 ```js:vite.config.js
 import { defineConfig } from "vite";
@@ -153,16 +153,16 @@ npm 側の依存関係とコマンドは `package.json` に書きます。Scala 
     "postinstall": "scalawind generate --check-duplication --check-optimization -f scalajs-react -o ./src/main/scala/todo/scalawind.scala -p todo"
   },
   "dependencies": {
-    "react": "19.1.1",
-    "react-dom": "19.1.1"
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@scala-js/vite-plugin-scalajs": "1.1.0",
-    "autoprefixer": "10.4.24",
+    "autoprefixer": "10.6.0",
     "postcss": "8.5.28",
     "scalawind": "1.0.3",
     "tailwindcss": "3.4.17",
-    "vite": "7.3.6"
+    "vite": "8.3.0"
   }
 }
 ```
@@ -340,10 +340,10 @@ Vite plugin が Scala.js の出力を必要なタイミングで扱うため、�
 npm run build
 ```
 
-このとき Vite plugin が `fullLinkJS` を実行し、Scala.js の出力と Tailwind の CSS を production 用のアセットへまとめます。
+このとき Vite plugin が `fullLinkJS` を実行し、Scala.js の JavaScript と Tailwind の CSS を production 用のアセットへまとめます。
 
 :::message
-Scala の変更だけを追いながら linker の動きを見たいときは、別ターミナルで次を実行できます。
+Scala の変更だけを追いながら JavaScript を更新したいときは、別ターミナルで次を実行できます。
 
 ```bash
 sbt '~fastLinkJS'
@@ -352,11 +352,6 @@ sbt '~fastLinkJS'
 これは Scala ファイルを保存するたびに、Scala.js の JavaScript 出力を更新します。通常の起動には必須ではなく、Scala.js の差分更新を確認したいときの補助コマンドです。
 :::
 
-実際に試すときは、以下の順で操作できます。
-
-1. 入力欄に TODO を書いて「追加」を押す
-2. チェックボックスを押して完了状態にする
-3. 「削除」を押して TODO を消す
 
 ## Scala.js + Reactがブラウザで動くまで
 
@@ -364,9 +359,7 @@ sbt '~fastLinkJS'
 
 ```text
 Scala のソースコード
-  ↓ scalac / Scala.js compiler
-Scala.js IR
-  ↓ Scala.js linker（fastLinkJS / fullLinkJS）
+  ↓ sbt の `fastLinkJS` / `fullLinkJS`
 JavaScript
   ↓ Vite
 ブラウザ
@@ -374,7 +367,9 @@ JavaScript
 画面
 ```
 
-Scala のソースをコンパイルすると Scala.js IR が作られます。linker は IR とライブラリの IR から JavaScript を出力します。Vite は Scala を直接コンパイルするものではなく、Vite plugin を通じてその JavaScript を読み込み、HTML や CSS と一緒にブラウザへ配信します。
+`sbt` が Scala のコードをブラウザで実行できる JavaScript にビルドします。開発中は素早く出力する `fastLinkJS`、本番ビルドでは時間をかけて最適化する `fullLinkJS` が使われます。
+
+Vite は Scala を直接コンパイルするものではありません。Vite plugin を通じて sbt の生成した JavaScript を読み込み、HTML や Tailwind CSS と一緒にブラウザへ配信します。最後に React が DOM を描画します。
 
 ## まとめ
 
