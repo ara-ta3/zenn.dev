@@ -3,7 +3,7 @@ title: "無料で個人開発するときに使っているサービスと構成
 emoji: "🛠️"
 type: "tech"
 topics: ["cloudflare", "firebase", "githubactions", "oraclecloud"]
-published: false
+published: true
 ---
 
 ## はじめに
