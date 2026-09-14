@@ -1,5 +1,6 @@
 {
     "rules": {
+        "preset-ai-words-ja": true,
         "spellcheck-tech-word": true,
         "preset-ja-technical-writing": {
             "preset-ja-spacing": false,
