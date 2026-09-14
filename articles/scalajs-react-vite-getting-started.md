@@ -1,9 +1,9 @@
 ---
-title: "Scala.js + React + ViteでTODOアプリを動かすまで"
+title: "Scala.js + React + ViteでTODOアプリを動かす"
 emoji: "📝"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["scala", "scalajs", "react", "vite", "tailwindcss"]
-published: false
+published: true
 ---
 
 ## はじめに
