@@ -8,9 +8,10 @@ published: false
 
 ## はじめに
 
-例えば、申し込みできるかを判定するテストに、次のような Parameterized Test がありました。
+以下のようなテストがありました。    
+テストデータを配列で保持し、それを利用してParameterized Testするというものです。  
 
-```ts
+```js
 test.each([
   ["未成年の利用者", { age: 17 }],
   ["退会済みの利用者", { status: "withdrawn" }],
@@ -21,17 +22,51 @@ test.each([
 });
 ```
 
-assertion 周辺のコード量は少なく、ケースを配列へ追加するだけでよいです。追加が簡単なので、便利に見えます。テストケース名へラベルを入れておけば、テストランナーで実行結果を読むときにも困りません。
+assertion 周辺のコード量は少なく、ケースを配列へ追加するだけでよいです。  
+追加が簡単なので、便利に見えます。  
+テストケース名へラベルを入れておけば、テストランナーで実行結果を読むときにも困りません。  
 
-一方で、数か月後の自分や、このテストを書いていない人が読む場面を考えると、少し気になります。何を保証しているのかを理解するには、まず assertion を見て、次に配列の1ケースを取り出し、そのケースの意味を考える必要があります。
+一方で、数か月後の自分や、このテストを書いていない人が読む場面を考えたとき、  
+何を保証しているのかを理解するために、まず assertion を見て、次に配列の1ケースを取り出し、そのケースの意味を考える必要があります。  
 
-この例だけなら、そこまで大きな問題ではないかもしれません。ケースも少なく、どの行も `false` を期待しているので、頭の中で追えます。
+この例だけなら、そこまで大きな問題ではないかもしれません。  
+ケースも少なく、どの行も `false` を期待しているので、頭の中で追えます。
 
-ただ、入力オブジェクトや期待値が複雑になり、ケースも増えていくとどうでしょうか。個別のテストならテスト名と assertion を読むだけで済むところに、テーブルを経由して仕様を復元する1ステップが増えます。この小さな手順がケースごとに積み重なると、読むときの認知負荷は高くなっていきそうです。
+ただ、入力オブジェクトや期待値が複雑になり、ケースも増えていくとどうでしょうか。  
+個別のテストならテスト名と assertion を読むだけで済むところに、テーブルを経由して仕様を復元する1ステップが増えます。  
+この小さな手順がケースごとに積み重なると、読むときの認知負荷は高くなっていくのではないかと感じています。  
 
-[xUnit Test Patterns の Obscure Test](http://xunitpatterns.com/Obscure%20Test.html) という言葉を知ってから、テストを短くすることと、テストを読みやすくすることは別なのかもしれないと思うようになりました。
+xUnit Test Patterns の Obscure Testというパターンにもあるように、読んだ際に仕様について考える必要があるテストは避けるほうが良いと個人的には考えており、短くしたり追加しやすくするなどと天秤にかけるべきものではないかなと感じています。  
+http://xunitpatterns.com/Obscure%20Test.html
 
-今回は、Parameterized Test が Obscure Test になりそうな場面と、Example-Based Test / Parameterized Test / Property-Based Testing の使い分けを考えてみます。
+つまり以下のような形式で愚直に書くほうが良いと考えています。  
+
+```js
+describe("申し込み可否", () => {
+  test("未成年の利用者は申し込みできない", () => {
+    expect(canApply({ age: 17, status: "active", paymentMethod: "card" })).toBe(false);
+  });
+
+  test("退会済みの利用者は申し込みできない", () => {
+    expect(canApply({ age: 20, status: "withdrawn", paymentMethod: "card" })).toBe(false);
+  });
+
+  test("利用停止中の利用者は申し込みできない", () => {
+    expect(canApply({ age: 20, status: "suspended", paymentMethod: "card" })).toBe(false);
+  });
+
+  test("支払い方法が未登録の利用者は申し込みできない", () => {
+    expect(canApply({ age: 20, status: "active", paymentMethod: null })).toBe(false);
+  });
+
+  test("条件を満たす利用者は申し込みできる", () => {
+    expect(canApply({ age: 20, status: "active", paymentMethod: "card" })).toBe(true);
+  });
+});
+
+```
+
+今回は、Parameterized Test が Obscure Test になりそうな場面と、具体例を個別に書くテスト / Parameterized Test / Property-Based Testing の使い分けを考えてみます。  
 
 ## Parameterized Test は便利
 
