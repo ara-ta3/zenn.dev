@@ -8,7 +8,7 @@ overrides:
   body-parser@<2.3.0: '>=2.3.0'
   brace-expansion@>=4.0.0 <5.0.9: '>=5.0.9'
   fast-uri@<4.1.3: '>=4.1.3'
-  hono: 4.13.7
+  hono: 4.13.8
   ip-address@<10.1.1: '>=10.1.1'
   qs@<6.15.2: '>=6.15.2'
   js-yaml@<5.2.2: '>=5.2.2'
@@ -21,8 +21,8 @@ importers:
         specifier: 15.8.0
         version: 15.8.0
       textlint-rule-preset-ai-words-ja:
-        specifier: 1.2.0
-        version: 1.2.0
+        specifier: 1.2.1
+        version: 1.2.1
       textlint-rule-preset-ja-technical-writing:
         specifier: 12.0.2
         version: 12.0.2
@@ -829,9 +829,6 @@ packages:
   kuromoji@0.1.2:
     resolution: {integrity: sha512-V0dUf+C2LpcPEXhoHLMAop/bOht16Dyr+mDiIE39yX3vqau7p80De/koFqpiTcL1zzdZlc3xuHZ8u5gjYRfFaQ==}
 
-  kuromojin@3.0.0:
-    resolution: {integrity: sha512-3h3qnn/NVVhqoKFP4oc7e6apO2B01Atc056oiVlIY7Uoup4rhrnBe28g3y9lK1HTmLDQEejvXB+3I3qxAneF7A==}
-
   kuromojin@3.0.1:
     resolution: {integrity: sha512-E4rLmbTid8ZGH8Fw421UXvfgCe0IXGFKhUw/IosBVW6ootxVGKGbtb0UPQAvPswgsXX/8UuPiE+amz1NN11Uzg==}
 
@@ -1287,8 +1284,8 @@ packages:
   textlint-rule-no-zero-width-spaces@1.0.1:
     resolution: {integrity: sha512-AkxpzBILGB4YsXddzHx2xqpXmqMv5Yd+PQm4anUV+ADSJuwLP1Jd6yHf/LOtu9j3ps8K3XM9vQrXRK73z0bU3A==}
 
-  textlint-rule-preset-ai-words-ja@1.2.0:
-    resolution: {integrity: sha512-vW9ZVTf/fz9+m53656xDUzviRezsq4ybxrJmR8Dql++1gF6ej2K4mcqxJFg+TiaUvYIyyitUAT3ZRmNEqQH6ag==}
+  textlint-rule-preset-ai-words-ja@1.2.1:
+    resolution: {integrity: sha512-yTXyIn+3QvtTBffSqLAJoGfhCNkR6hjTlGbOJ6vnlN9/qhtqMWOo69DyYeDj7WVWjlljgxbadFkLQd6winGb1w==}
 
   textlint-rule-preset-ja-technical-writing@12.0.2:
     resolution: {integrity: sha512-BBVY6oA5V799k5wRfP+gCpDHsp6vWjWX2UT+/KLlAFFsNdmRB8Z6qyOnqiOjfzmLGIRgoMcPI1dXj5upOqnD6Q==}
@@ -1867,7 +1864,7 @@ snapshots:
 
   analyze-desumasu-dearu@5.0.1:
     dependencies:
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
 
   ansi-escapes@7.3.0:
     dependencies:
@@ -2422,11 +2419,6 @@ snapshots:
       doublearray: 0.0.2
       zlibjs: 0.3.1
 
-  kuromojin@3.0.0:
-    dependencies:
-      kuromoji: 0.1.2
-      lru_map: 0.4.1
-
   kuromojin@3.0.1:
     dependencies:
       '@kvs/env': 2.2.2
@@ -2963,7 +2955,7 @@ snapshots:
 
   textlint-rule-ja-no-abusage@3.0.0:
     dependencies:
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
       morpheme-match-textlint: 2.0.6
       textlint-rule-prh: 5.3.0
 
@@ -2975,7 +2967,7 @@ snapshots:
   textlint-rule-ja-no-redundant-expression@4.0.1:
     dependencies:
       '@textlint/regexp-string-matcher': 1.1.1
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
       morpheme-match: 2.0.4
       morpheme-match-all: 2.0.5
       textlint-rule-helper: 2.3.1
@@ -2984,11 +2976,11 @@ snapshots:
   textlint-rule-ja-no-successive-word@2.0.1:
     dependencies:
       '@textlint/regexp-string-matcher': 1.1.1
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
 
   textlint-rule-ja-no-weak-phrase@2.0.0:
     dependencies:
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
       morpheme-match: 2.0.4
       morpheme-match-all: 2.0.5
 
@@ -3010,38 +3002,38 @@ snapshots:
 
   textlint-rule-max-ten@5.0.0:
     dependencies:
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
       sentence-splitter: 5.0.0
       textlint-rule-helper: 2.3.1
       textlint-util-to-string: 3.3.4
 
   textlint-rule-no-double-negative-ja@2.0.1:
     dependencies:
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
 
   textlint-rule-no-doubled-conjunction@3.0.0:
     dependencies:
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
       sentence-splitter: 5.0.0
       textlint-rule-helper: 2.3.1
 
   textlint-rule-no-doubled-conjunctive-particle-ga@3.0.0:
     dependencies:
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
       sentence-splitter: 5.0.0
       textlint-rule-helper: 2.3.1
       textlint-util-to-string: 3.3.4
 
   textlint-rule-no-doubled-joshi@5.1.0:
     dependencies:
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
       sentence-splitter: 5.0.0
       textlint-rule-helper: 2.3.1
       textlint-util-to-string: 3.3.4
 
   textlint-rule-no-dropping-the-ra@3.0.0:
     dependencies:
-      kuromojin: 3.0.0
+      kuromojin: 3.0.1
       textlint-rule-helper: 2.3.1
 
   textlint-rule-no-exclamation-question-mark@1.1.0:
@@ -3069,7 +3061,7 @@ snapshots:
 
   textlint-rule-no-zero-width-spaces@1.0.1: {}
 
-  textlint-rule-preset-ai-words-ja@1.2.0:
+  textlint-rule-preset-ai-words-ja@1.2.1:
     dependencies:
       kuromojin: 3.0.1
       morpheme-match-textlint: 2.0.6
