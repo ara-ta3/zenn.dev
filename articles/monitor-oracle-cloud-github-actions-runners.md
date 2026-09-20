@@ -82,7 +82,7 @@ flowchart LR
 
 PrometheusとGrafanaは、OCIではなく自宅にあるMac mini 2012で動かしています。Mac miniにはUbuntuを入れており、監視サーバーだけでなくGitHub Actionsのランナーも同居させています。古いマシンですが、常時起動して監視と軽いジョブを動かす用途なら今のところ使えています。
 
-## ランナー3台と200GBのストレージ
+## OCIのインスタンスをGitHub Actions Runnerとして使う
 
 ### 強いインスタンスと小さいインスタンス
 
@@ -131,7 +131,7 @@ CIに必要なツールや依存関係をDockerイメージ側へまとめられ
 正直、小さいランナーを2台とも残す必要があるかは少し怪しいです。強いランナーしかほぼ使わない場合、小さい2台をなくし、A1へ50GBのBoot Volumeと150GBのBlock Volumeを割り当てる方が管理は楽だと思います。今は実験できる実行先を残したいので、3台構成にしています。
 :::
 
-### 開発のRepositoryごとにRunnerを使い分ける
+### 開発対象のGitHub RepositoryごとにRunnerを使い分ける
 
 ランナーの使い分けは、CPUアーキテクチャよりもRepositoryの開発頻度とビルド負荷で決めています。開発が活発でビルドも重いものは強いA1へ寄せ、Private Repositoryではあるものの、ビルドがさほど重くないものは小さいインスタンスへ流しています。
 
@@ -141,7 +141,7 @@ CIに必要なツールや依存関係をDockerイメージ側へまとめられ
 
 強いインスタンスで同時に動かすRunnerを増やしすぎると、CPUやメモリを奪い合って逆に遅くなります。そのため、今はCPU数を目安にしています。
 
-## Tailscaleで管理用のネットワークを作る
+## Tailscaleで管理用ネットワークを作る
 
 ### OCIとMac miniをTailnetへ入れる
 
@@ -182,7 +182,7 @@ OCI側では、Public IP宛てのInbound通信を許可していません。node
 
 Tailnetに参加できる端末も自分が管理するものだけにしています。台数が少ないうちは、VPNや証明書を自分で組むよりも設定が少なくて便利でした。
 
-## PrometheusとGrafanaでディスク容量の監視を作る
+## PrometheusとGrafanaで監視基盤を作る
 
 ### node_exporterをPrometheusへ登録する
 
@@ -247,6 +247,8 @@ node_exporterからはCPUやメモリなどのメトリクスも取得できま�
 `/`は各インスタンスのBoot Volumeです。強いインスタンスへ追加したBlock Volumeは`/mnt/storage`へMountしているため、`mountpoint`ではこの2つだけを対象にしています。`host!=""`を付け、hostラベルが設定されている系列だけを表示します。
 
 GitHub Actionsのジョブが失敗してから容量不足へ気づくよりも、どのランナーの空き容量が減っているかを一覧で見られる方が楽です。追加したBlock Volumeが意図したMount Pointで使われているかも確認できます。
+
+## ディスク容量を監視して掃除する
 
 ### しきい値を下回ったらSlackへ通知する
 
