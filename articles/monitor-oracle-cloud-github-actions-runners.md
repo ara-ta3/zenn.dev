@@ -6,21 +6,21 @@ topics: ["oraclecloud", "githubactions", "tailscale", "prometheus", "grafana"]
 published: false
 ---
 
-個人開発では、サービスそのものだけでなく、CIを動かす環境にも費用がかかります。できるだけ無料で個人開発を続けたかったので、Oracle CloudのAlways Freeで作ったインスタンスをGitHub ActionsのSelf-hosted Runnerとして使っています。
+個人開発では、サービスそのものだけでなく、CIを動かす環境にも費用がかかります。できるだけ無料で個人開発を続けたかったので、Oracle Cloud Infrastructure（以下、OCIと書きます）のAlways Freeで作ったインスタンスをGitHub ActionsのSelf-hosted Runnerとして使っています。
 
 以前、ホスティングやデータ保存先も含め、無料で個人開発するときに使っているサービスを以下の記事へまとめました。
 
 https://zenn.dev/ara_ta3/articles/develop-with-free-services
 
-その中でもOracle CloudのSelf-hosted Runnerは、自分でインスタンスを管理する必要があります。今回は、Runnerの使い分け、ストレージの配分、監視と容量不足への対応について整理がてらまとめてみました。
+その中でもOCIのSelf-hosted Runnerは、自分でインスタンスを管理する必要があります。今回は、Runnerの使い分け、ストレージの配分、監視と容量不足への対応について整理がてらまとめてみました。
 
 しばらく動かしていると気になるのがディスク容量です。Dockerのイメージやビルド成果物が残ると、思ったよりもディスクを使います。SSHで各インスタンスへ入り、毎回`df`を見るのも面倒です。でも見ないと急にCIが止まります。
 
 そこで、各インスタンスをTailscaleのTailnetへ参加させ、PrometheusとGrafanaでディスク容量を見られるようにしました。Grafanaはインターネットへ公開せず、自宅のネットワーク内からMac miniのIPアドレスを指定してアクセスします。
 
-Oracle Cloudの各インスタンスではPublic IP宛てのInbound通信を許可せず、SSHでの接続やPrometheusからの収集にはTailscaleを使っています。
+OCIの各インスタンスではPublic IP宛てのInbound通信を許可せず、SSHでの接続やPrometheusからの収集にはTailscaleを使っています。
 
-この記事は、Oracle Cloudの3台へ無料枠の200GBを配分し、自宅で動かしているMac mini 2012からディスク容量を監視している構成の備忘録です。
+この記事は、OCIの3台へ無料枠の200GBを配分し、自宅で動かしているMac mini 2012からディスク容量を監視している構成の備忘録です。
 
 ## 全体の構成
 
@@ -29,10 +29,20 @@ Oracle Cloudの各インスタンスではPublic IP宛てのInbound通信を許�
 ```mermaid
 flowchart LR
   github[GitHub Actions]
-  arm[強いランナー<br>OCI Ampere A1]
-  micro1[小さいランナー 1<br>AMD Micro]
-  micro2[小さいランナー 2<br>AMD Micro]
-  monitoring[Mac mini 2012<br>Ubuntu / Runner<br>Prometheus / Grafana]
+
+  subgraph tailnet[TailscaleのTailnet]
+    direction LR
+
+    subgraph oracle[OCI]
+      direction TB
+      arm[強いランナー<br>OCI Ampere A1]
+      micro1[小さいランナー 1<br>AMD Micro]
+      micro2[小さいランナー 2<br>AMD Micro]
+    end
+
+    monitoring[Mac mini 2012<br>Ubuntu / Runner<br>Prometheus / Grafana]
+  end
+
   pc[手元のPC]
 
   github -->|複数のRunnerへ<br>ジョブを割り当てる| arm
@@ -43,21 +53,14 @@ flowchart LR
   arm -->|メトリクス| monitoring
   micro1 -->|メトリクス| monitoring
   micro2 -->|メトリクス| monitoring
-  pc -->|Grafanaを見る| monitoring
-
-  subgraph tailnet[TailscaleのTailnet]
-    arm
-    micro1
-    micro2
-    monitoring
-  end
+  monitoring -->|Grafanaの画面| pc
 ```
 
 ### 登場人物の整理
 
 役割は以下のように分けています。
 
-- Oracle Cloud
+- OCI
   - 強いインスタンス
     - 開発が活発で、ビルドやテストが重いRepositoryのRunnerを動かす
     - CPU数に合わせて複数のRunnerを動かす
@@ -68,37 +71,37 @@ flowchart LR
 - 自宅
   - Mac mini 2012
     - Ubuntuを入れて常時起動する
-    - PrometheusでOracle Cloudの各インスタンスからメトリクスを取得する
+    - PrometheusでOCIの各インスタンスからメトリクスを取得する
     - GrafanaでPrometheusのデータをグラフにする
     - GitHub ActionsのRunnerとしても使う
   - 手元のPC
     - 自宅LANからMac miniのGrafanaを見る
 - Tailscale
-  - Oracle Cloudの各インスタンスとMac miniを同じTailnetへ参加させる
+  - OCIの各インスタンスとMac miniを同じTailnetへ参加させる
   - Prometheusからnode_exporterへ接続するときに使う
 
-PrometheusとGrafanaは、Oracle Cloudではなく自宅にあるMac mini 2012で動かしています。Mac miniにはUbuntuを入れており、監視サーバーだけでなくGitHub Actionsのランナーも同居させています。古いマシンですが、常時起動して監視と軽いジョブを動かす用途なら今のところ使えています。
+PrometheusとGrafanaは、OCIではなく自宅にあるMac mini 2012で動かしています。Mac miniにはUbuntuを入れており、監視サーバーだけでなくGitHub Actionsのランナーも同居させています。古いマシンですが、常時起動して監視と軽いジョブを動かす用途なら今のところ使えています。
 
 ## ランナー3台と200GBのストレージ
 
 ### 強いインスタンスと小さいインスタンス
 
-Oracle CloudのAlways Freeでは、Armの`VM.Standard.A1.Flex`と、小さいAMDインスタンスの`VM.Standard.E2.1.Micro`を使えます。
+OCIのAlways Freeでは、Armの`VM.Standard.A1.Flex`と、小さいAMDインスタンスの`VM.Standard.E2.1.Micro`を使えます。
 
 この記事で「強い」「小さい」と呼んでいるインスタンスの違いは以下のとおりです。A1は割り当てを変更できるFlex Shapeですが、ここではAlways Freeの範囲で1台へまとめて割り当てた場合を載せています。
 
 |呼び方|Shape|CPUアーキテクチャ|CPU|メモリ|主な使い方|
 |---|---|---|---:|---:|---|
-|強いインスタンス|VM.Standard.A1.Flex|Arm|2 OCPU|12GB|開発が活発で、ビルドやテストが重いRepository|
-|小さいインスタンス|VM.Standard.E2.1.Micro|AMD|1/8 OCPU|1GB|ビルドがさほど重くないPrivate Repository|
+|強いインスタンス|VM.Standard.A1.Flex|arm64|2 OCPU|12GB|開発が活発で、ビルドやテストが重いRepository|
+|小さいインスタンス|VM.Standard.E2.1.Micro|x86_64|1/8 OCPU|1GB|ビルドがさほど重くないPrivate Repository|
 
-OCPUはOracle CPUの略で、OCIでCPU性能を表す単位です。A1の場合、1 OCPUがArmプロセッサの1コアにあたります。
+OCPUはOracle CPUの略で、OCIで割り当てるCPUリソースの単位です。A1の場合、1 OCPUがArmプロセッサの1コアにあたります。
 
 メモリだけでも12GBと1GBの差があります。E2.1.MicroのCPUは追加のCPUリソースを一時的に利用できるものの、基本は1/8 OCPUです。この差があるため、同じSelf-hosted Runnerでも担当するRepositoryを分けています。
 
-### 無料で利用できるVolumeの200GBを3台へ配分する
+### 無料枠の200GBを3台へ配分する
 
-以下の公式ドキュメントによると、Always Freeで使えるBlock Volumeはテナンシ全体で合計200GBです。この200GBには、追加したBlock Volumeだけでなく各インスタンスのBoot Volumeも含まれます。
+2026年9月時点の公式ドキュメントによると、Always Freeで使えるBlock Volumeはテナンシ全体で合計200GBです。この200GBには、追加したBlock Volumeだけでなく各インスタンスのBoot Volumeも含まれます。
 
 https://docs.oracle.com/en-us/iaas/Content/FreeTier/freetier_topic-Always_Free_Resources.htm
 
@@ -140,9 +143,9 @@ CIに必要なツールや依存関係をDockerイメージ側へまとめられ
 
 ## Tailscaleで管理用のネットワークを作る
 
-### Oracle CloudとMac miniをTailnetへ入れる
+### OCIとMac miniをTailnetへ入れる
 
-Grafanaの画面を確認するためだけに、Grafanaのポートをインターネットへ公開したくはありませんでした。そこで、Oracle Cloudの3台と自宅のMac miniへTailscaleを入れ、同じTailnetへ参加させています。
+Grafanaの画面を確認するためだけに、Grafanaのポートをインターネットへ公開したくはありませんでした。そこで、OCIの3台と自宅のMac miniへTailscaleを入れ、同じTailnetへ参加させています。
 
 ちなみに、この記事を書いている途中で、Tailscaleの公式ドキュメントにもGrafanaとの組み合わせがあることを知りました。この構成を作った後で知ったものなので、構築時には参考にしていません。似た使い方を考えている方には役立ちそうです。
 
@@ -175,7 +178,7 @@ flowchart LR
   end
 ```
 
-Oracle Cloud側では、Public IP宛てのInbound通信を許可していません。node_exporterの9100番ポートにはTailscale経由で接続します。Mac miniで動かしているGrafanaの3000番ポートも、自宅LANの外からはアクセスできないようにしています。
+OCI側では、Public IP宛てのInbound通信を許可していません。node_exporterの9100番ポートにはTailscale経由で接続します。Mac miniで動かしているGrafanaの3000番ポートも、自宅LANの外からはアクセスできないようにしています。
 
 Tailnetに参加できる端末も自分が管理するものだけにしています。台数が少ないうちは、VPNや証明書を自分で組むよりも設定が少なくて便利でした。
 
@@ -219,7 +222,7 @@ scrape_configs:
           host: "oracle-primary"
 ```
 
-Prometheus自身は`localhost:9090`、各ランナーは`servers`というジョブで収集しています。Tailscale経由で接続するため、Oracle Cloud上のPublic IPをPrometheusへ並べる必要はありません。`host`ラベルには、Grafana上で見分けやすい名前を付けています。
+Prometheus自身は`localhost:9090`、各ランナーは`servers`というジョブで収集しています。Tailscale経由で接続するため、OCI上のPublic IPをPrometheusへ並べる必要はありません。`host`ラベルには、Grafana上で見分けやすい名前を付けています。
 
 ### Grafanaでディスクの空き容量を計算する
 
@@ -272,9 +275,10 @@ prune/work:
 
 ## まとめと感想
 
-この構成にして、Oracle Cloudの無料枠をGitHub Actionsの実行環境として使いつつ、ディスク容量を1か所から確認できるようになりました。
+この構成にして、OCIの無料枠をGitHub Actionsの実行環境として使いつつ、ディスク容量を1か所から確認できるようになりました。
 
-特に良かったのは、Grafanaやnode_exporterをインターネットへ公開せずに済んだことです。PrometheusはTailscale経由でOracle Cloudから収集し、Grafanaは自宅LANからだけ見られるようにしています。自分用の管理画面を置く用途と相性が良いと感じています。
+特に良かったのは、Grafanaやnode_exporterをインターネットへ公開せずに済んだことです。PrometheusはTailscale経由でOCIから収集し、Grafanaは自宅LANからだけ見られるようにしています。自分用の管理画面を置く用途と相性が良いと感じています。
 
-一方で、Oracle Cloudの3台とMac miniがあるので、OSやランナーの更新対象も増えます。小さいランナーを使っていない場合、無理に台数を増やさず、強いランナーへストレージとジョブを寄せる構成でも十分そうです。
-近い未来1台になってそうな気がするなと思いつつ個人開発を続けていこうと思いました。
+一方で、OCIの3台とMac miniがあるので、OSやランナーの更新対象も増えます。小さいランナーを使っていない場合、無理に台数を増やさず、強いランナーへストレージとジョブを寄せる構成でも十分そうです。
+
+近い未来、OCI側はA1の1台だけになっていそうな気もしますが、実際の利用状況を見ながら個人開発を続けていこうと思います。
