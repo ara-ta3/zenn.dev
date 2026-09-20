@@ -3,7 +3,7 @@ title: "無料で個人開発するためにOracle CloudのGitHub Actionsラン�
 emoji: "📊"
 type: "tech"
 topics: ["oraclecloud", "githubactions", "tailscale", "prometheus", "grafana"]
-published: false
+published: true
 ---
 
 個人開発では、サービスそのものだけでなく、CIを動かす環境にも費用がかかります。できるだけ無料で個人開発を続けたかったので、Oracle Cloud Infrastructure（以下、OCIと書きます）のAlways Freeで作ったインスタンスをGitHub ActionsのSelf-hosted Runnerとして使っています。
