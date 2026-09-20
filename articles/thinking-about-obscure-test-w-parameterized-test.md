@@ -2,191 +2,134 @@
 title: "Obscure Test について考える — Parameterized Test と仕様の読みやすさ"
 emoji: "🔍"
 type: "idea" # tech: 技術記事 / idea: アイデア
-topics: ["test", "tdd", "testing"]
+topics: ["test", "testing", "vitest"]
 published: false
 ---
 
 ## はじめに
 
-以下のようなテストがありました。    
-テストデータを配列で保持し、それを利用してParameterized Testするというものです。  
+テストコードを読んでいて、次のような Parameterized Test が少し気になりました。日本語ではパラメータ化テストと呼ばれるものです。この記事のコード例では Vitest を使います。
 
 ```js
 test.each([
-  ["未成年の利用者", { age: 17 }],
-  ["退会済みの利用者", { status: "withdrawn" }],
-  ["利用停止中の利用者", { status: "suspended" }],
-  ["支払い方法が未登録の利用者", { paymentMethod: null }],
-])("%s は申し込みできない", (_, user) => {
-  expect(canApply(user)).toBe(false);
+  ["未成年の利用者", { age: 17, status: "active", paymentMethod: "card" }, false],
+  ["退会済みの利用者", { age: 20, status: "withdrawn", paymentMethod: "card" }, false],
+  ["利用停止中の利用者", { age: 20, status: "suspended", paymentMethod: "card" }, false],
+  ["支払い方法が未登録の利用者", { age: 20, status: "active", paymentMethod: null }, false],
+  ["条件を満たす利用者", { age: 20, status: "active", paymentMethod: "card" }, true],
+])("%s は申し込みできるか", (_, user, expected) => {
+  expect(canApply(user)).toBe(expected);
 });
 ```
 
-assertion 周辺のコード量は少なく、ケースを配列へ追加するだけでよいです。  
-追加が簡単なので、便利に見えます。  
-テストケース名へラベルを入れておけば、テストランナーで実行結果を読むときにも困りません。  
+assertion 周辺のコードは少なく、ケースを配列へ追加するだけでテストを増やせます。ラベルもあるため、失敗したケースはテスト結果から特定できます。書く側から見ると、かなり便利です。
 
-一方で、数か月後の自分や、このテストを書いていない人が読む場面を考えたとき、  
-何を保証しているのかを理解するために、まず assertion を見て、次に配列の1ケースを取り出し、そのケースの意味を考える必要があります。  
+一方で、数か月後の自分や、このテストを書いていない人が読む場面を考えると、少し気になります。1ケースが何を保証しているのか理解するには、まず assertion を見て、配列から1行を取り出し、引数の順番へ当てはめる必要があります。その上で、入力のどの値が期待結果を決めているのかを考えます。
 
-この例だけなら、そこまで大きな問題ではないかもしれません。  
-ケースも少なく、どの行も `false` を期待しているので、頭の中で追えます。
+この例だけなら、そこまで大きな問題ではありません。ケースも少なく、期待値もほとんどが `false` なので、頭の中で追えます。
 
-ただ、入力オブジェクトや期待値が複雑になり、ケースも増えていくとどうでしょうか。  
-個別のテストならテスト名と assertion を読むだけで済むところに、テーブルを経由して仕様を復元する1ステップが増えます。  
-この小さな手順がケースごとに積み重なると、読むときの認知負荷は高くなっていくのではないかと感じています。  
+ただ、入力や期待値が複雑になり、ケースが増えるとどうでしょうか。テーブルとテスト本体を往復して仕様を復元する小さな手順が、読むケースの数だけ積み重なります。コード量は減っていても、読む側の認知負荷は高くなっているかもしれません。
 
-xUnit Test Patterns の Obscure Testというパターンにもあるように、読んだ際に仕様について考える必要があるテストは避けるほうが良いと個人的には考えており、短くしたり追加しやすくするなどと天秤にかけるべきものではないかなと感じています。  
-http://xunitpatterns.com/Obscure%20Test.html
+この記事では、Parameterized Test を避けたいわけではありません。どのようなケースをまとめると読みやすく、どこから仕様が見えにくくなるのかを考えてみます。
 
-つまり以下のような形式で愚直に書くほうが良いと考えています。  
+## そのテーブルは1つの仕様を表しているか
+
+先ほどのテーブルには、次のルールが並んでいます。
+
+- 未成年の利用者は申し込めない
+- 退会済みの利用者は申し込めない
+- 利用停止中の利用者は申し込めない
+- 支払い方法が未登録の利用者は申し込めない
+- 条件を満たす利用者は申し込める
+
+すべて `canApply` の戻り値を確認している点では同じです。ただし、各行が存在する理由は異なります。年齢、アカウントの状態、支払い方法という別々のルールを、引数の形が同じだから1つのテーブルへ入れています。
+
+テーブルを展開すると、次のように書けます。
 
 ```js
-describe("申し込み可否", () => {
-  test("未成年の利用者は申し込みできない", () => {
-    expect(canApply({ age: 17, status: "active", paymentMethod: "card" })).toBe(false);
-  });
-
-  test("退会済みの利用者は申し込みできない", () => {
-    expect(canApply({ age: 20, status: "withdrawn", paymentMethod: "card" })).toBe(false);
-  });
-
-  test("利用停止中の利用者は申し込みできない", () => {
-    expect(canApply({ age: 20, status: "suspended", paymentMethod: "card" })).toBe(false);
-  });
-
-  test("支払い方法が未登録の利用者は申し込みできない", () => {
-    expect(canApply({ age: 20, status: "active", paymentMethod: null })).toBe(false);
-  });
-
-  test("条件を満たす利用者は申し込みできる", () => {
-    expect(canApply({ age: 20, status: "active", paymentMethod: "card" })).toBe(true);
-  });
+test("未成年の利用者は申し込みできない", () => {
+  expect(
+    canApply({ age: 17, status: "active", paymentMethod: "card" }),
+  ).toBe(false);
 });
 
+test("退会済みの利用者は申し込みできない", () => {
+  expect(
+    canApply({ age: 20, status: "withdrawn", paymentMethod: "card" }),
+  ).toBe(false);
+});
+
+test("利用停止中の利用者は申し込みできない", () => {
+  expect(
+    canApply({ age: 20, status: "suspended", paymentMethod: "card" }),
+  ).toBe(false);
+});
+
+test("支払い方法が未登録の利用者は申し込みできない", () => {
+  expect(
+    canApply({ age: 20, status: "active", paymentMethod: null }),
+  ).toBe(false);
+});
+
+test("条件を満たす利用者は申し込みできる", () => {
+  expect(
+    canApply({ age: 20, status: "active", paymentMethod: "card" }),
+  ).toBe(true);
+});
 ```
 
-今回は、Parameterized Test が Obscure Test になりそうな場面と、具体例を個別に書くテスト / Parameterized Test / Property-Based Testing の使い分けを考えてみます。  
+コードは増えました。ただ、それぞれのテストだけを読めば、前提と期待結果が分かります。ケースを理解するために、配列の列とテスト関数の引数を対応させる必要もありません。
 
-## Parameterized Test は便利
+もちろん、行数が増えたから読みやすくなった、と単純には言えません。同じ仕様に対する値の違いまで全部展開すると、今度は重複がノイズになります。ここで分けて考えたいのは、重複しているのがコードなのか、同じ仕様の具体例なのかという点です。
 
-例えば、年齢から区分を決める処理があるとします。
+## Obscure Test として考える
 
-```ts
-describe.each([
+xUnit Test Patterns には、テストの意図を一目で理解しにくい状態を表す **Obscure Test** という名前があります。
+
+https://xunitpatterns.com/Obscure%20Test.html
+
+Parameterized Test は Obscure Test ではありません。テーブルから入力と期待値の関係が素直に読めるなら、むしろ見通しを良くできます。
+
+ただ、異なる理由で存在するケースを1つのテーブルへまとめると、テストの意図がデータの並びへ押し込まれます。ラベルを付ければ失敗したケースは分かりますが、そのケースがなぜ必要なのかまで読みやすくなるとは限りません。
+
+自分が気にしているのは、Parameterized Test という書き方そのものではなく、抽象化した結果として仕様まで隠れていないか、という点なのだと思います。
+
+## Parameterized Test が合いそうなケース
+
+Parameterized Test が読みやすいのは、1つの仕様を複数の入力で確かめる場合です。
+
+例えば、年齢による区分の境界値を確認します。
+
+```js
+test.each([
   [0, "child"],
   [12, "child"],
   [13, "adult"],
   [64, "adult"],
   [65, "senior"],
-])("%i歳の場合は%sになる", (age, expected) => {
-  test("年齢区分を返す", () => {
-    expect(toAgeGroup(age)).toBe(expected);
-  });
+])("%i歳の区分は%sになる", (age, expected) => {
+  expect(toAgeGroup(age)).toBe(expected);
 });
 ```
 
-このくらいなら、入力値と期待値の対応がそのまま読めます。
+このテーブルは、年齢区分という1つの仕様に対する代表値と境界値を並べています。入力と期待値の対応がそのまま仕様の具体例になっているため、テーブルにする意味も分かりやすいです。
 
-- 子ども・大人・高齢者の境界値を確認している
-- それぞれの区分に代表値がある
-- ケースを追加するときも、表に1行足せばよい
+今のところ、Parameterized Test を使うときは次の点を見ると良さそうだと考えています。
 
-同じ仕様に対する複数の代表値や境界値を並べる用途では、Parameterized Test はかなり便利です。
+- 各行を同じ理由で説明できるか
+- 変化する値が入力と期待値だけか
+- テーブルが仕様の具体例として読めるか
+- 失敗した行をテスト結果から特定できるか
 
-## そのテーブルは仕様の一覧になっていないか
+反対に、各行へ別々の背景や業務ルールを説明したくなったら、個別のテストへ戻すことを考えます。
 
-導入のテストのように、テーブルに入っている各行が別々の理由で存在していると、少し事情が変わります。テスト名にラベルがあっても、テーブルを読むだけでは仕様の境界が少し分かりにくいです。
+## 値を増やしたいだけなら Property-Based Testing も考える
 
-- 未成年はなぜ申し込めないのか
-- 退会済みと利用停止中は、同じ理由で扱われているのか
-- 支払い方法の未登録は、申込条件なのか、申込後の入力不足なのか
-- 条件が組み合わさったとき、どの条件が優先されるのか
+Parameterized Test のケースを増やしていると、具体例を確認したいのではなく、入力全体に対する性質を確認したかったと気づくことがあります。
 
-テストを追加した人は理由を知っているかもしれませんが、あとから読む人は各行を読み解く必要があります。
+例えば、文字列を正規化した後に連続する空白が残らないことを確認します。
 
-ここではコードの重複は減っていますが、仕様まで抽象化されています。
-
-## Obscure Test とは
-
-xUnit Test Patterns では、テストの意図や失敗した理由を理解しにくい状態を **Obscure Test** と呼んでいます。
-
-Parameterized Test が常に Obscure Test になるわけではありません。ただし、テストケースごとに異なる業務上の理由があるのに、それらを単なる入力値の違いとして1つのテーブルへ押し込むと、テストの意図が隠れやすくなります。
-
-先ほどの例なら、個別のテストとして書くほうが、少なくとも仕様は読みやすそうです。
-
-```ts
-test("未成年は申し込めない", () => {
-  expect(canApply({ age: 17 })).toBe(false);
-});
-
-test("退会済みの利用者は申し込めない", () => {
-  expect(canApply({ status: "withdrawn" })).toBe(false);
-});
-
-test("利用停止中の利用者は申し込めない", () => {
-  expect(canApply({ status: "suspended" })).toBe(false);
-});
-
-test("支払い方法が未登録の利用者は申し込めない", () => {
-  expect(canApply({ paymentMethod: null })).toBe(false);
-});
-```
-
-少し重複して見えますが、それぞれが何を保証しているのかは分かりやすくなりました。
-
-重複したコードと、重複した仕様は別物です。
-
-## Parameterized Test に向いているケース
-
-今のところ、次のようなケースでは Parameterized Test が合いやすいと思っています。
-
-- 1つの仕様を複数の代表値で確認したい
-- 境界値を並べて確認したい
-- 入力値そのものにテストケースとしての意味がある
-- 各行の存在理由を、同じテスト名と構造で説明できる
-
-例えば、送料が購入金額によって変わる仕様です。
-
-```ts
-describe.each([
-  [0, 500],
-  [4_999, 500],
-  [5_000, 0],
-  [10_000, 0],
-])("%i円の注文", (subtotal, expectedShippingFee) => {
-  test(`送料は${expectedShippingFee}円になる`, () => {
-    expect(calculateShippingFee(subtotal)).toBe(expectedShippingFee);
-  });
-});
-```
-
-これは「5,000円未満は送料500円、5,000円以上は送料無料」という1つの仕様を、境界値と代表値で確認しています。テーブルがそのまま仕様の例になっています。
-
-## それ、Property-Based Testing では？
-
-Parameterized Test を書いていると、同じ性質を確かめるためだけに値をたくさん列挙していることもあります。
-
-例えば、文字列を正規化する関数について、空白の数や位置を大量に並べている場合です。
-
-```ts
-describe.each([
-  ["hello  world", "hello world"],
-  [" hello world", "hello world"],
-  ["hello world ", "hello world"],
-  ["  hello   world  ", "hello world"],
-])("normalize(%j)", (input, expected) => {
-  test(`%j を返す`, () => {
-    expect(normalize(input)).toBe(expected);
-  });
-});
-```
-
-これらのケースが個別の仕様として重要なら、Parameterized Test のままでよいと思います。
-
-一方で、本当に確認したいのが「任意の文字列を正規化した結果、連続した空白が残らない」のような性質なら、Property-Based Testing が仕様をより直接に表せるかもしれません。
-
-```ts
+```js
 test("正規化後の文字列には連続した空白が含まれない", () => {
   fc.assert(
     fc.property(fc.string(), (input) => {
@@ -196,29 +139,25 @@ test("正規化後の文字列には連続した空白が含まれない", () =>
 });
 ```
 
-もちろん、Property-Based Testing は万能ではありません。失敗したときに具体例を理解しにくいこともありますし、ドメインに合った入力生成や、どの性質を保証するかを考える必要があります。
+ここで確認したいのは、いくつかの文字列に対する個別の期待結果ではありません。「どの文字列を正規化しても、連続する空白が残らない」という性質です。こうした場合は、値をテーブルへ追加し続けるより、Property-Based Testingとして書くほうが意図に近そうです。
 
-ただ、値の列挙が増えてきたときには、一旦「これは複数の例を確認したいのか、それとも入力集合に対する性質を確認したいのか」を考えてみると良さそうです。
+QuickCheck の原論文では、プログラムの性質を Haskell の関数として記述し、ランダムな入力で自動的に確かめる仕組みが説明されています。
 
-## Example / Parameterized / Property を使い分ける
+https://doi.org/10.1145/351240.351266
 
-雑に整理すると、次のように考えています。
+ScalaCheck の User Guide でも、property specification と自動生成したテストデータに基づく仕組みとして説明されています。
 
-| 種類 | 向いているもの |
-| --- | --- |
-| Example-Based Test | 個別のシナリオ、業務上の理由があるケース |
-| Parameterized Test | 一つの仕様に対する代表値、境界値 |
-| Property-Based Testing | 多くの入力に共通する性質 |
+https://github.com/typelevel/scalacheck/blob/main/doc/UserGuide.md
 
-大事なのは、テストコードの行数を減らすことではなく、何を保証しているテストなのかを読めるようにすることだと思います。
+Parameterized Test と Property-Based Testing は、値を複数試す点だけを見ると似ています。ただ、前者は選んだ具体例を並べ、後者は入力に対して成り立つ性質を記述するもの、という理解です。
 
-Parameterized Test を選ぶときは、テーブルの各行が「同じ仕様の例」になっているかを見ています。もし各行に異なる背景や業務ルールがあるなら、少し重複していても個別の Example-Based Test として書いたほうが、将来読む人には親切かもしれません。
+具体的な不具合の再現や、業務上重要なシナリオまで Property-Based Testing へ置き換える必要はありません。個別のケースとして残したいものは個別に書き、境界値や代表値は Parameterized Test で並べ、入力全体へ成り立つ性質は Property-Based Testing で表す、くらいに分けるのが良さそうです。
 
 ## まとめ
 
-- Parameterized Test は、同じ仕様の代表値や境界値を確認するのに便利
-- 行ごとに異なる理由があるテーブルは、Obscure Test になりやすい
-- コードの重複と仕様の重複は分けて考えたい
-- 値を大量に列挙しているなら、Property-Based Testing で性質として書けないかも考える
+- 個別の理由があるケースは、個別のテストとして書くと意図を追いやすい
+- 同じ仕様の代表値や境界値は、Parameterized Test にまとめると読みやすい
+- 入力全体に対する性質を確認したいなら、Property-Based Testing を検討する
+- テストコードの短さだけでなく、何を保証しているかを読める状態にしたい
 
-テストを短くすることよりも、何を保証しているかを読みやすくすることを優先していきたいです。
+Parameterized Test は便利なので、今後も使うと思います。ただ、ケースを配列へ追加する前に、その行が同じ仕様の具体例なのか、別の仕様を押し込もうとしているのかは一度考えてみたいです。
