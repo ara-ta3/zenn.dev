@@ -50,9 +50,9 @@ flowchart LR
   github -->|ジョブを割り当てる| micro2
   github -->|ジョブを割り当てる| monitoring
 
-  arm -->|メトリクス| monitoring
-  micro1 -->|メトリクス| monitoring
-  micro2 -->|メトリクス| monitoring
+  arm ---|監視対象| monitoring
+  micro1 ---|監視対象| monitoring
+  micro2 ---|監視対象| monitoring
   monitoring -->|Grafanaの画面| pc
 ```
 
@@ -147,7 +147,7 @@ CIに必要なツールや依存関係をDockerイメージ側へまとめられ
 
 Grafanaの画面を確認するためだけに、Grafanaのポートをインターネットへ公開したくはありませんでした。そこで、OCIの3台と自宅のMac miniへTailscaleを入れ、同じTailnetへ参加させています。
 
-ちなみに、この記事を書いている途中で、Tailscaleの公式ドキュメントにもGrafanaとの組み合わせがあることを知りました。この構成を作った後で知ったものなので、構築時には参考にしていません。似た使い方を考えている方には役立ちそうです。
+ちなみに、この記事を書いている途中で、Tailscaleの公式ドキュメントにもGrafanaとの組み合わせがあることを知りました。この構成を作った後で知ったものなので、構築時には参考にしていません。今回とはGrafanaへのアクセス方法が異なりますが、似た構成を考えている方には役立ちそうです。
 
 https://tailscale.com/docs/integrations/grafana
 
@@ -165,9 +165,9 @@ flowchart LR
   monitoring[Mac mini 2012<br>Prometheus / Grafana]
   pc[手元のPC]
 
-  monitoring -->|Tailscale IP:9100から取得| arm
-  monitoring -->|Tailscale IP:9100から取得| micro1
-  monitoring -->|Tailscale IP:9100から取得| micro2
+  monitoring <-->|Tailscale IP:9100<br>scrape / メトリクス| arm
+  monitoring <-->|Tailscale IP:9100<br>scrape / メトリクス| micro1
+  monitoring <-->|Tailscale IP:9100<br>scrape / メトリクス| micro2
   pc -->|自宅LANのIP:3000へアクセス| monitoring
 
   subgraph tailnet[TailscaleのTailnet]
@@ -252,7 +252,7 @@ GitHub Actionsのジョブが失敗してから容量不足へ気づくよりも
 
 ### しきい値を下回ったらSlackへ通知する
 
-Grafanaでは、上記のクエリで求めた空き容量の割合にしきい値を設定しています。空き容量がしきい値を下回ると、個人で使っているSlackワークスペースへAlertを送ります。Grafanaを毎日見に行かなくても、掃除が必要になったタイミングで気づけます。
+Grafanaでは、上記のクエリで求めた空き容量の割合にしきい値を設定しています。空き容量がしきい値を下回ると、個人で使っているSlackワークスペースへアラートを送ります。Grafanaを毎日見に行かなくても、掃除が必要になったタイミングで気づけます。
 
 ### Slack通知を受けたらMakefileから掃除する
 
