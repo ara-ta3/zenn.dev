@@ -3,7 +3,7 @@ title: "Obscure Test を Working Memory から考える"
 emoji: "🔍"
 type: "idea" # tech: 技術記事 / idea: アイデア
 topics: ["test", "unittest", "テスト設計", "認知科学", "可読性"]
-published: false
+published: true
 ---
 
 ## はじめに
