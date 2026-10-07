@@ -4,6 +4,7 @@
         "config:best-practices"
     ],
     "automerge": true,
+    "platformAutomerge": true,
     "timezone": "Asia/Tokyo",
     "separateMajorMinor": false,
     "minimumReleaseAge": "3 days",
