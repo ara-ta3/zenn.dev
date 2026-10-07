@@ -57,7 +57,7 @@ class UserRepositoryProtocol(Protocol):
 
 # 主要なコンポーネントの実装
 
-次に、定義した `Protocol` を利用して、アプリケーションの主要な部品の `Service` と `Repository` を実装します。
+次に、定義した `Protocol` を利用して、アプリケーションの主要な構成部分として `Service` と `Repository` を実装します。
 
 ## Service クラス
 
