@@ -2,7 +2,7 @@
     "rules": {
         "preset-ai-words-ja": {
             "no-ai-words": {
-                "severity": "warning"
+                "severity": "error"
             }
         },
         "spellcheck-tech-word": true,
