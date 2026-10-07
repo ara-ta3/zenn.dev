@@ -72,7 +72,7 @@ PostgreSQL や Supabase Studio が含まれた環境が立ち上がります。
 :::message
 
 colima などを使っている場合に、 `container is not ready: unhealthy` と言われ起動しないことがあります。  
-これは Docker 上からログを取得して死活監視する vector と logflare がうまく行っていないためです。  
+これは Docker 上からログを取得して稼働状態を監視する vector と logflare がうまく行っていないためです。  
 今回軽く検証したのですが、どうにも動かせなかったため-x オプションにより除外し動かすことにしています。
 
 ```bash

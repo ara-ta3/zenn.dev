@@ -161,13 +161,13 @@ class NoManifestRule extends SemanticRule("NoManifestRule") {
 }
 ```
 
-`SymbolMatcher.normalized` で import alias 後のシンボルに対しても確実にマッチさせています。`Patch.lint` を返すことで、検知した瞬間に scalafix が失敗します。
+`SymbolMatcher.normalized` で import alias 後のシンボルに対しても確実にマッチさせています。`Patch.lint` を返すことで、検知した時点で scalafix が失敗します。
 
 このルールは「文字列」ではなく「シンボル」で判定することで、alias や implicit 経由でも確実に拾う、という意図です。
 
 ## 動かし方
 
-以下のコマンドで走らせます。
+以下のコマンドで実行します。
 
 ```bash
 sbt example/compile
@@ -189,7 +189,7 @@ sbt:root> example/scalafix
 [error] Total time: 0 s, completed 2025/12/14 14:05:33
 ```
 
-これにより **ローカルで Manifest が混入した瞬間にコンパイルを落とす** 仕組みができました。
+これにより、**Manifest の混入を検知した時点でローカルのコンパイルを落とす**仕組みができました。
 Manifest を消す（`import scala.reflect.Manifest` を削除し、`ClassTag` に書き換えるなど）と、そのまま `scalafix` が通るようになります。落ちる/通るの差分をすぐ確認できます。
 ※ json4s の警告メッセージ上では `Manifest` の代替として `ClassTag` への実装などが推奨されているため、まずは `ClassTag` への置き換えを目指すのが現実的と考えています。
 
@@ -217,6 +217,6 @@ semanticdb を使わない場合の余談
 ## まとめ
 
 semanticdb + scalafix の Semantic Rule で、import alias/implicit 経由でも `Manifest` を検知出来るようになりました。  
-この設定を CI に組み込めば、Manifest が混入した瞬間にビルドを落とすこともできます。
+この設定を CI に組み込めば、Manifest が混入した時点でビルドを落とすこともできます。
 Scala3 移行のために機械的に検出したい際に使えると良いなと思います。  
 また、Scalafix のカスタムルールを作るのも容易だったので、何かしら禁止にしたいことや Scala3 移行で困ることがあれば使っていきたいなと思いました。
