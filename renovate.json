@@ -24,8 +24,15 @@
         },
         {
             "matchPackageNames": ["pnpm"],
-            "allowedVersions": "<11",
-            "matchManagers": ["npm"]
+            "matchManagers": ["npm"],
+            "groupName": "pnpm"
+        },
+        {
+            "description": "pnpm のメジャー更新は設定移行 (pnpm-workspace.yaml など) を伴うため手動でマージする",
+            "matchPackageNames": ["pnpm"],
+            "matchManagers": ["npm"],
+            "matchUpdateTypes": ["major"],
+            "automerge": false
         }
     ],
     "lockFileMaintenance": {
