@@ -2,7 +2,6 @@
 
 ## 投稿情報
 
-- 状態: ローカル原稿完成、Hashnode未投稿
 - 日本語原文: https://zenn.dev/ara_ta3/articles/scalajs-react-vite-getting-started
 - 本文: hashnodes/scalajs-react-vite-getting-started.md（投稿時はfrontmatterを除く）
 - 推奨slug: scalajs-react-vite-getting-started

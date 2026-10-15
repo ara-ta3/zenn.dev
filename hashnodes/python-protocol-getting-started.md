@@ -3,7 +3,6 @@ title: "Dependency Injection in Python with Protocol and dependency-injector"
 emoji: "🐍"
 type: "tech"
 topics: ["python", "dependency-injection", "testing", "typing"]
-published: false
 ---
 
 ## Introduction

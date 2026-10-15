@@ -3,7 +3,6 @@ title: "How to Calculate the Median in MySQL 8 with Window Functions"
 emoji: "📑"
 type: "tech"
 topics: ["mysql", "sql", "statistics"]
-published: false
 ---
 
 ## Introduction

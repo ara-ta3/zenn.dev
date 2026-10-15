@@ -3,7 +3,6 @@ title: "How to Load a .env File into a Go Struct with Viper"
 emoji: "📚"
 type: "tech"
 topics: ["go", "viper", "configuration"]
-published: false
 ---
 
 ## Introduction

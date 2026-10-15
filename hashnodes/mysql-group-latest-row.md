@@ -3,7 +3,6 @@ title: "How to Get the Latest Row per Group in MySQL 8 Using ROW_NUMBER()"
 emoji: "📊"
 type: "tech"
 topics: ["mysql", "sql", "database"]
-published: false
 ---
 
 ## Introduction

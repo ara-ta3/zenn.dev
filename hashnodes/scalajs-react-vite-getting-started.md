@@ -3,7 +3,6 @@ title: "Build a Todo App with Scala.js, React, and Vite"
 emoji: "📝"
 type: "tech"
 topics: ["scala", "scalajs", "react", "vite", "tailwindcss"]
-published: false
 ---
 
 ## Introduction

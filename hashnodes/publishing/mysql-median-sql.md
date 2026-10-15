@@ -2,7 +2,6 @@
 
 ## 投稿情報
 
-- 状態: ローカル原稿完成、Hashnode未投稿
 - 日本語原文: https://zenn.dev/ara_ta3/articles/mysql-median-sql
 - 本文: hashnodes/mysql-median-sql.md（投稿時はfrontmatterを除く）
 - 推奨slug: mysql-median-sql
