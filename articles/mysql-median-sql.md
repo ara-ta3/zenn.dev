@@ -117,15 +117,16 @@ mysql> select ROW_NUMBER() over (order by len asc) , t.* from (SELECT id, name, 
 最も直感的で、古いバージョンのMySQLでも使える方法です。  
 「全体をソートして、真ん中のレコードを直接取得する」というアプローチです。  
 
-`LIMIT` と `OFFSET` には計算式やサブクエリを直接書けないため、先に取得件数とスキップする件数を計算します。
-今回の11件では、それぞれ1件と5件になるので、後述のクエリでは `LIMIT 1 OFFSET 5` と指定します。
-
 ```sql
 SELECT
-  COUNT(*) AS total_count,
-  2 - COUNT(*) % 2 AS take_count,
-  GREATEST(0, FLOOR((COUNT(*) - 1) / 2)) AS skip_count
-FROM products;
+  AVG(sub.len) AS median_length
+FROM (
+  SELECT CHAR_LENGTH(name) AS len
+  FROM products
+  ORDER BY len
+  LIMIT 2 - (SELECT COUNT(*) FROM products) % 2    -- 偶数なら2件、奇数なら1件
+  OFFSET (SELECT (COUNT(*) - 1) / 2 FROM products) -- 中央のレコードまでスキップ
+) AS sub;
 
 
 # サブクエリの値確認
@@ -186,12 +187,14 @@ WITH ordered AS (
     COUNT(*) OVER () AS total_count
   FROM products
 )
-SELECT AVG(len) AS median_length
-FROM ordered
-WHERE rn IN (
-  FLOOR((total_count + 1) / 2),
-  FLOOR((total_count + 2) / 2)
-);
+SELECT
+  CASE
+    WHEN total_count % 2 = 1 THEN
+      MAX(CASE WHEN rn = (total_count + 1) / 2 THEN len END)
+    ELSE
+      AVG(CASE WHEN rn IN (total_count / 2, total_count / 2 + 1) THEN len END)
+  END AS median_length
+FROM ordered;
 ```
 このクエリでは、`WITH`句を使って以下の3つの情報を各行に付与しています。  
 
