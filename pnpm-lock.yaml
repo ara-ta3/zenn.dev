@@ -191,10 +191,16 @@ importers:
         specifier: 5.0.0
         version: 5.0.0(textlint@15.8.0(supports-color@7.2.0))
       zenn-cli:
-        specifier: 0.5.6
-        version: 0.5.6(@types/markdown-it@14.2.0)(supports-color@7.2.0)
+        specifier: 0.5.7
+        version: 0.5.7(@types/markdown-it@14.2.0)(supports-color@7.2.0)
 
 packages:
+
+  '@ai-sdk/anthropic@4.0.85':
+    resolution: {integrity: sha512-nfv/vtR4HuNUZyCzdK37d2CaW1mzeZJlzSmC+4Jn8Dn8ces8R9HOAgF9d+8iwx+SedmzurKQQmNvJ7xYGBcPMQ==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
 
   '@ai-sdk/fireworks@3.0.43':
     resolution: {integrity: sha512-WFxp0Ccw/mP+n5TQNrSKgm/z7nkuLrD5qCQ1TNJAYhWsVuimxPmcUXz2QWvEHjPE4HendZ5JrOs0fUczeQyTYg==}
@@ -225,6 +231,16 @@ packages:
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/provider-utils@5.0.65':
+    resolution: {integrity: sha512-LCugcsP8oWmdeI3BASf4Fuo1wiC6Qx0YrefFssl7n12s+LV4DNi5RdwWQrtrB4oek3GGNQRN/h/NSwVZM2eHKw==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/provider@4.0.31':
+    resolution: {integrity: sha512-3wJnwVTFg8SwOyoZCv+ov7Re2GB+7IQnU5a5MYJACrtiWDDUHgqTBeeesq2MB2ddgojzL8hgWleltwpAgtUqfg==}
+    engines: {node: '>=22'}
 
   '@ai-sdk/provider@4.0.8':
     resolution: {integrity: sha512-aWO7iwhFUGf347tCwNGggggfmZigaSu7TF739IZSrWWABUp7zkb4Cr3fMqvBe5EIS7ABJJu3Cadn0g/zs1G0QQ==}
@@ -282,6 +298,13 @@ packages:
   '@modelcontextprotocol/server@2.3.1':
     resolution: {integrity: sha512-e59MfWuSssj6DoQ96JCTqdW1AXT5/XtnTl0WWd6MU1Ka434fFUGGosCLJbGNySDhHGvxQWoRWK137FXYFkYNWw==}
     engines: {node: '>=20'}
+
+  '@openrouter/ai-sdk-provider@3.1.0':
+    resolution: {integrity: sha512-BQy1TA9fKrh47s9ivsO6FY5QimN7GUF0i8Qon3pkxQclEgShso0dClpcWn8OIyPLEZZPFaFKgI8TW4S/O0p0Dw==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      ai: ^7.0.0
+      zod: ^3.25.76 || ^4.1.8
 
   '@secretlint/config-loader@11.7.1':
     resolution: {integrity: sha512-XExWOV82/nbuo9N+m6G9by4n2mnts3Z1k2i499pIJ0+VaASbA06u1fQFErMGYrobeUpSTC5i077Ee7G2lJhFiw==}
@@ -928,10 +951,6 @@ packages:
     resolution: {integrity: sha512-qCqy1xSoaugxOD4IVHb1ZWdkvCF2W3aE2okKouWj8VwJ+ztskSiXoBnCSJqfKT+cVPJhuJqe9YLbY425+Zh00g==}
     engines: {node: '>= 18'}
 
-  extend-shallow@2.0.1:
-    resolution: {integrity: sha512-zCnTtlxNoAiDc3gqY2aYAWFx7XWWiasuF2K8Me5WbN8otHKTUKBwjPtNpRs/rbUZm7KxWAaNj7P1a/p52GbVug==}
-    engines: {node: '>=0.10.0'}
-
   extend-shallow@3.0.2:
     resolution: {integrity: sha512-BwY5b5Ql4+qZoefgMj2NUmx+tehVTH/Kf4k1ZEtOHNFcm2wSxMRo992l6X3TIgni2eZVTZ85xMOjF31fwZAj6Q==}
     engines: {node: '>=0.10.0'}
@@ -1038,10 +1057,6 @@ packages:
 
   graceful-fs@4.2.11:
     resolution: {integrity: sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==}
-
-  gray-matter@4.0.3:
-    resolution: {integrity: sha512-5v6yZd4JK3eMI3FqqCouswVqwugaA9r4dNZB1wwcmrD02QkV5H0y7XBQW8QwQqEaZY1pM9aqORSORhJRdNK44Q==}
-    engines: {node: '>=6.0'}
 
   has-bigints@1.0.2:
     resolution: {integrity: sha512-tSvCKtBr9lkF0Ex0aQiP9N+OpV4zi2r/Nee5VkRDbaqv35RLYMzbwQfFSZZH0kR+Rd6302UJZ2p/bJCEoR3VoQ==}
@@ -1193,10 +1208,6 @@ packages:
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
     hasBin: true
 
-  is-extendable@0.1.1:
-    resolution: {integrity: sha512-5BMULNob1vgFX6EjQw5izWDxrecWK9AM72rugNr0TFldMOi0fj6Jk+zeKIt0xGj4cEfQIJth4w3OKWOJ4f+AFw==}
-    engines: {node: '>=0.10.0'}
-
   is-extendable@1.0.1:
     resolution: {integrity: sha512-arnXMxT1hhoKo9k1LZdmlNyJdDDfy2v0fXjFlmok4+i8ul/6WlbVge9bhM74OpNPQPMGUToDtz+KXa1PneJxOA==}
     engines: {node: '>=0.10.0'}
@@ -1308,10 +1319,6 @@ packages:
 
   keyv@5.5.0:
     resolution: {integrity: sha512-QG7qR2tijh1ftOvClut4YKKg1iW6cx3GZsKoGyJPxHkGWK9oJhG9P3j5deP0QQOGDowBMVQFaP+Vm4NpGYvmIQ==}
-
-  kind-of@6.0.3:
-    resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
-    engines: {node: '>=0.10.0'}
 
   kuromoji@0.1.2:
     resolution: {integrity: sha512-V0dUf+C2LpcPEXhoHLMAop/bOht16Dyr+mDiIE39yX3vqau7p80De/koFqpiTcL1zzdZlc3xuHZ8u5gjYRfFaQ==}
@@ -1768,10 +1775,6 @@ packages:
     resolution: {integrity: sha512-CvY+PV+NBhxe3BnjFI5f//vEDKLULm9OlZArso7gdgVsWvanBuq9PNDx+/2llfL+8XFYa/UNBxvqRBg3TWU2Ug==}
     engines: {node: '>=22.12.0'}
 
-  section-matter@1.0.0:
-    resolution: {integrity: sha512-vfD3pmTzGpufjScBh50YHKzEu2lxBWhVEHsNGoEXmCmn2hKGfeNLYMzCJpe8cD7gqX7TJluOVpBkAequ6dgMmA==}
-    engines: {node: '>=4'}
-
   semver@7.7.2:
     resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
     engines: {node: '>=10'}
@@ -1883,10 +1886,6 @@ packages:
   strip-ansi@7.2.0:
     resolution: {integrity: sha512-yDPMNjp4WyfYBkHnjIRLfca1i6KMyGCtsVgoKe/z1+6vukgaENdgGBZt+ZmKPc4gavvEZ5OgHfHdrazhgNyG7w==}
     engines: {node: '>=12'}
-
-  strip-bom-string@1.0.0:
-    resolution: {integrity: sha512-uCC2VHvQRYu+lMh4My/sFNmF2klFymLX1wHJeXnbEJERpV/ZsVuonzerjfrGpIGF7LBVa1O7i9kjiWvJiFck8g==}
-    engines: {node: '>=0.10.0'}
 
   structured-source@3.0.2:
     resolution: {integrity: sha512-Ap7JHfKgmH40SUjumqyKTHYHNZ8GvGQskP34ks0ElHCDEig+bYGpmXVksxPSrgcY9rkJqhVMzfeg5GIpZelfpQ==}
@@ -2240,13 +2239,13 @@ packages:
     resolution: {integrity: sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==}
     engines: {node: '>=0.4'}
 
-  zenn-cli@0.5.6:
-    resolution: {integrity: sha512-KTSj+X2CcMdraSqmzoYsXDafcXuAOD1UbXFwbzgTeyRXAluhbWttAA5cDFj1UV0oCfxB8P8oFm0f+uMTJt1muQ==}
+  zenn-cli@0.5.7:
+    resolution: {integrity: sha512-RC22iYXbA7Nai8swEDxcWEM98Fz7UgAv1LK3HoD3PTqNE6sLgy8RpQtRImPeqz7l8Up6J+MtUaTn0FN1QkHsrw==}
     engines: {node: '>=22.12.0'}
     hasBin: true
 
-  zenn-markdown-html@0.5.6:
-    resolution: {integrity: sha512-JjYcSJIs7b4v/nUTNOx/BpNgQMbJntUvV65nW33DNnUS2cBv2LZFZI1mF3mGn3vrwh0UVRpnXAkfUHO47p4VUQ==}
+  zenn-markdown-html@0.5.7:
+    resolution: {integrity: sha512-c+NKB4h5DUopgCEHEaohtK0oGaydcO7YnTRr1xrOTEx4k1oM+fAYsMr6+GUMcmb9ks6ey8Aqk+RNe58EiEh/RA==}
     engines: {node: '>=22.12.0'}
 
   zlibjs@0.3.1:
@@ -2262,6 +2261,12 @@ packages:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
 snapshots:
+
+  '@ai-sdk/anthropic@4.0.85(zod@4.4.3)':
+    dependencies:
+      '@ai-sdk/provider': 4.0.31
+      '@ai-sdk/provider-utils': 5.0.65(zod@4.4.3)
+      zod: 4.4.3
 
   '@ai-sdk/fireworks@3.0.43(zod@4.4.3)':
     dependencies:
@@ -2297,6 +2302,19 @@ snapshots:
       eventsource-parser: 3.1.1
       undici: 7.29.1
       zod: 4.4.3
+
+  '@ai-sdk/provider-utils@5.0.65(zod@4.4.3)':
+    dependencies:
+      '@ai-sdk/provider': 4.0.31
+      '@standard-schema/spec': 1.1.0
+      '@workflow/serde': 4.1.0
+      eventsource-parser: 3.1.1
+      undici: 7.29.1
+      zod: 4.4.3
+
+  '@ai-sdk/provider@4.0.31':
+    dependencies:
+      json-schema: 0.4.0
 
   '@ai-sdk/provider@4.0.8':
     dependencies:
@@ -2361,6 +2379,11 @@ snapshots:
   '@modelcontextprotocol/server@2.3.1':
     dependencies:
       '@modelcontextprotocol/core': 2.3.1
+      zod: 4.4.3
+
+  '@openrouter/ai-sdk-provider@3.1.0(ai@7.0.84(zod@4.4.3))(zod@4.4.3)':
+    dependencies:
+      ai: 7.0.84(zod@4.4.3)
       zod: 4.4.3
 
   '@secretlint/config-loader@11.7.1(supports-color@7.2.0)':
@@ -3224,10 +3247,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  extend-shallow@2.0.1:
-    dependencies:
-      is-extendable: 0.1.1
-
   extend-shallow@3.0.2:
     dependencies:
       assign-symbols: 1.0.0
@@ -3348,13 +3367,6 @@ snapshots:
   gopd@1.2.0: {}
 
   graceful-fs@4.2.11: {}
-
-  gray-matter@4.0.3:
-    dependencies:
-      js-yaml: 5.4.2
-      kind-of: 6.0.3
-      section-matter: 1.0.0
-      strip-bom-string: 1.0.0
 
   has-bigints@1.0.2: {}
 
@@ -3517,8 +3529,6 @@ snapshots:
 
   is-docker@3.0.0: {}
 
-  is-extendable@0.1.1: {}
-
   is-extendable@1.0.1:
     dependencies:
       is-plain-object: 2.0.4
@@ -3613,8 +3623,6 @@ snapshots:
   keyv@5.5.0:
     dependencies:
       '@keyv/serialize': 1.1.0
-
-  kind-of@6.0.3: {}
 
   kuromoji@0.1.2:
     dependencies:
@@ -4184,11 +4192,6 @@ snapshots:
       parse-srcset: 1.0.2
       postcss: 8.5.29
 
-  section-matter@1.0.0:
-    dependencies:
-      extend-shallow: 2.0.1
-      kind-of: 6.0.3
-
   semver@7.7.2: {}
 
   send@1.2.1(supports-color@7.2.0):
@@ -4356,8 +4359,6 @@ snapshots:
   strip-ansi@7.2.0:
     dependencies:
       ansi-regex: 6.3.0
-
-  strip-bom-string@1.0.0: {}
 
   structured-source@3.0.2:
     dependencies:
@@ -4892,10 +4893,12 @@ snapshots:
 
   xtend@4.0.2: {}
 
-  zenn-cli@0.5.6(@types/markdown-it@14.2.0)(supports-color@7.2.0):
+  zenn-cli@0.5.7(@types/markdown-it@14.2.0)(supports-color@7.2.0):
     dependencies:
+      '@ai-sdk/anthropic': 4.0.85(zod@4.4.3)
       '@ai-sdk/fireworks': 3.0.43(zod@4.4.3)
       '@ai-sdk/openai': 4.0.51(zod@4.4.3)
+      '@openrouter/ai-sdk-provider': 3.1.0(ai@7.0.84(zod@4.4.3))(zod@4.4.3)
       '@secretlint/node': 11.7.1(supports-color@7.2.0)
       '@secretlint/secretlint-rule-preset-recommend': 11.7.1
       ai: 7.0.84(zod@4.4.3)
@@ -4907,14 +4910,13 @@ snapshots:
       configstore: 8.0.0
       express: 5.3.0(supports-color@7.2.0)
       fs-extra: 11.4.1
-      gray-matter: 4.0.3
       image-size: 2.0.4
       js-yaml: 5.4.2
       node-fetch: 3.3.2
       open: 10.2.0
       package-manager-detector: 1.6.0
       ws: 8.22.0
-      zenn-markdown-html: 0.5.6(@types/markdown-it@14.2.0)
+      zenn-markdown-html: 0.5.7(@types/markdown-it@14.2.0)
       zod: 4.4.3
     transitivePeerDependencies:
       - '@types/markdown-it'
@@ -4922,7 +4924,7 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  zenn-markdown-html@0.5.6(@types/markdown-it@14.2.0):
+  zenn-markdown-html@0.5.7(@types/markdown-it@14.2.0):
     dependencies:
       cheerio: 1.2.0
       markdown-it: 14.3.3
