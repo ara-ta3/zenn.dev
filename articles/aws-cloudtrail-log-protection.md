@@ -2,7 +2,7 @@
 title: "CloudTrailのログを保護するために使えるAWSの便利機能"
 emoji: "🔐"
 type: "tech"
-topics: ["aws", "cloudtrail", "s3", "security", "terraform"]
+topics: ["aws", "cloudtrail", "s3", "security"]
 published: true
 ---
 
