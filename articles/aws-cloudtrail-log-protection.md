@@ -56,6 +56,7 @@ AWS Organizationsを使っている場合、CloudTrailで組織全体のログ�
 https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html
 
 本番アカウント内でCloudTrailの収集設定を管理していると、その管理権限でログ収集を停止することもできてしまいます。組織でCloudTrailを管理すると、設定を管理する場所を本番アカウントの外へ出せます。
+IAMで権限調整を頑張るのではなく、そもそも仕組み上出来ないようにしてしまうというのが良いですね。  
 
 ### 保存先を別アカウントへ分ける
 
@@ -65,12 +66,12 @@ https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organi
 
 ### SCPで組織離脱を禁止する
 
-ただし、アカウントが組織から外れると、そのアカウントは組織のCloudTrailによる収集対象から外れます。
-
+アカウントが組織から外れると、そのアカウントは組織のCloudTrailによる収集対象から外れます。
 離脱前に保存されたログは残りますが、それ以降の操作は、組織のCloudTrailでは記録されなくなります。
 
 https://docs.aws.amazon.com/awscloudtrail/latest/userguide/creating-trail-organization.html
 
+そこでSCP、Service Control Policyです。  
 SCPは、AWS Organizationsのメンバーアカウントで実行できる操作の上限を制限するポリシーです。これを使って、メンバーアカウントからの組織離脱を禁止できます。`organizations:LeaveOrganization`を明示的に拒否すれば、対象アカウントで管理者権限を持っていても、その操作はできません。
 
 https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html
@@ -94,7 +95,6 @@ SCPは管理アカウントには適用されません。管理側からアカ�
 ## 2. Object Lockでログの削除を防ぐ
 
 次は、はじめの図の2にあたる、保存済みのログを保護する部分です。
-
 S3 Object Lockには、ガバナンスモードとコンプライアンスモードがあります。
 
 | モード | 保持期間中の保護 |
@@ -103,6 +103,7 @@ S3 Object Lockには、ガバナンスモードとコンプライアンスモー
 | コンプライアンス | rootを含め、保護されたバージョンの削除・上書きが不可 |
 
 コンプライアンスモードでは、適用済みの保持期間を短縮することもできません。「管理者なら消せる」という状態を避けられます。
+**誰も消せない** は考えることがなくなるのでとても好きです。  
 
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html
 
@@ -116,16 +117,8 @@ flowchart LR
 ```
 
 保持期限が過ぎると自動的に削除されるわけではありません。削除するタイミングは、ライフサイクルなどで別に管理します。
-
 組織のCloudTrailで収集設定を保護し、Object Lockで保存済みのログを保護する、という組み合わせになります。
-
-:::message
-Object Lockが保護する単位は、オブジェクトのバージョンです。新しいバージョンや削除マーカーの作成まで禁止するわけではありません。
-
-また、バケットにデフォルト保持期間を設定しても、既存オブジェクトに遡って適用されるわけではありません。
-:::
-
-保持期間中は自分でも消せなくなるので、期間は必要な調査期間や保管コストに応じて決めます。ここで挙げた90日は説明用の例です。
+保持期間中は自分でも消せなくなるので、期間は必要な調査期間や保管コストに応じて決めます。
 
 ## 3. rootアクセスを管理する
 
@@ -160,9 +153,8 @@ https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user-privileged-task.ht
 ### 管理アカウントのrootログインを通知する
 
 rootアクセスの一元管理の対象はメンバーアカウントで、管理アカウント自身は対象外です。
-
-管理アカウントにはSCPも適用されないので、普段使う権限を絞ることに加えて、rootが使われたときに気づけるようにしておくと良さそうです。
-
+管理アカウントにはSCPも適用されないので、普段使う権限を絞ることに加えて、rootが使われたときに気づけるようにしておくと良いのではないかと考えています。
+rootアカウントはあまり使わないようにするとセットですが、自Regionの操作ログに関してもSlack通知等で飛ばしてしまったほうが安心感があって良いでしょう。  
 通知経路としては、次のような構成にできます。
 
 ```mermaid
@@ -193,4 +185,6 @@ CloudTrailの収集設定を本番の管理権限から切り離し、保存し�
 - Object Lockのコンプライアンスモードでは、保持期間中のログをrootでも削除できない状態にできる
 - メンバーアカウントのroot認証情報を削除でき、管理アカウントのroot利用は通知できる
 
-今回はCloudTrailを中心にしましたが、今後はアプリケーションの操作ログも、適切に保護した保管先に残していけると良さそうです。
+やってみると欲しい機能が結構揃っているなと感じました。  
+AWSとても便利。  
+
