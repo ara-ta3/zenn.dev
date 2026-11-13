@@ -3,7 +3,7 @@ title: "5年後のエンジニアは、何に責任を持つのだろうか"
 emoji: "🔭"
 type: "idea" # tech: 技術記事 / idea: アイデア
 topics: ["ai", "engineering", "ポエム"]
-published: false
+published: true
 ---
 
 ## はじめに
